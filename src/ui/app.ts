@@ -15,6 +15,43 @@ function $(root: ParentNode, sel: string): HTMLElement {
   return el;
 }
 
+/** 介面圖示：同一套 24px 線條圖示，取代以 emoji 充當的圖示。 */
+const ICONS = {
+  hint: '<path d="M9.5 18h5M10.5 21h3"/><path d="M12 3a6 6 0 0 0-3.7 10.7c.7.6 1.2 1.4 1.2 2.3h5c0-.9.5-1.7 1.2-2.3A6 6 0 0 0 12 3z"/>',
+  trophy: '<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5.5a3 3 0 0 0 3 4.5M16 6h2.5a3 3 0 0 1-3 4.5"/><path d="M12 13v3.5M9 20.5h6M10 16.5h4v4h-4z"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="6.5"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>',
+  soundOn: '<path d="M4 9.5v5h3.5L12 18V6L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>',
+  soundOff: '<path d="M4 9.5v5h3.5L12 18V6L7.5 9.5z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/>',
+  lock: '<rect x="5.5" y="11" width="13" height="9.5" rx="2"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/>',
+  retry: '<path d="M4 12a8 8 0 1 0 2.6-5.9L4 8.5"/><path d="M4 4v4.5h4.5"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+} as const;
+
+function icon(name: keyof typeof ICONS, cls = 'icon'): string {
+  return `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${ICONS[name]}</svg>`;
+}
+
+/** 鍊成台背後的煉金法陣：外環刻度、三角與方陣，四方標上古典四元素符號。 */
+const SIGIL = `<svg class="sigil" viewBox="-14 -14 228 228" aria-hidden="true" focusable="false">
+  <g class="spin">
+  <circle cx="100" cy="100" r="97" />
+  <circle cx="100" cy="100" r="92" class="ticks" />
+  <circle cx="100" cy="100" r="86" />
+  <circle cx="100" cy="100" r="60" class="faint" />
+  <path d="M100 14L174.5 143H25.5z" />
+  <path d="M57.6 57.6h84.8v84.8H57.6z" class="faint" />
+  <path d="M100 100m-30 0a30 30 0 1 0 60 0a30 30 0 1 0-60 0" class="faint" />
+  <g class="glyphs">
+    <path d="M100 -9l6 10h-12z" />
+    <path d="M100 209l6-10h-12z" />
+    <path d="M-9 105l6-10l6 10zM-10.5 101h15" />
+    <path d="M203 95l6 10l6-10zM201.5 99h15" />
+  </g>
+  </g>
+</svg>`;
+
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+
 function esc(s: string): string {
   return s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 }
@@ -123,14 +160,14 @@ export class App {
     </div>
     <nav class="actions" aria-label="${t('header.settings')}">
       <button type="button" id="btn-hint" class="chip-btn">
-        <span aria-hidden="true">💡</span><span class="label">${t('header.hint')}</span>
+        ${icon('hint')}<span class="label">${t('header.hint')}</span>
         <span class="badge" id="hint-count"></span>
       </button>
       <button type="button" id="btn-ach" class="chip-btn">
-        <span aria-hidden="true">🏆</span><span class="label">${t('header.achievements')}</span>
+        ${icon('trophy')}<span class="label">${t('header.achievements')}</span>
       </button>
       <button type="button" id="btn-settings" class="chip-btn">
-        <span aria-hidden="true">⚙️</span><span class="label">${t('header.settings')}</span>
+        ${icon('gear')}<span class="label">${t('header.settings')}</span>
       </button>
     </nav>
   </header>
@@ -138,10 +175,12 @@ export class App {
   <main class="layout">
     <section class="bench" aria-labelledby="bench-title">
       <h2 id="bench-title" class="visually-hidden">${t('crucible.title')}</h2>
-      <div class="crucible" id="crucible">
+      <div class="crucible" id="crucible" data-fill="0">
+        ${SIGIL}
         <div class="slots" id="slots"></div>
         <div class="bowl" aria-hidden="true">
           <div class="bowl-glow"></div>
+          <div class="liquid"></div>
           <div class="bubbles"><i></i><i></i><i></i><i></i><i></i></div>
         </div>
         <div class="result" id="result"></div>
@@ -150,7 +189,7 @@ export class App {
         <button type="button" id="btn-clear" class="ghost-btn">${t('crucible.clear')}</button>
         <button type="button" id="btn-craft" class="primary-btn">${t('crucible.craft')}</button>
       </div>
-      <p class="tried" id="tried" hidden>⟲ ${t('crucible.tried')}</p>
+      <p class="tried" id="tried" hidden>${icon('retry')}${t('crucible.tried')}</p>
       <p class="help" id="help">${t('crucible.help')}</p>
       <button type="button" class="hint-banner" id="hint-banner" hidden></button>
     </section>
@@ -405,7 +444,7 @@ export class App {
         const n = i + 1;
         const plus = i > 0 ? '<span class="plus" aria-hidden="true">+</span>' : '';
         if (!id) {
-          return `${plus}<button type="button" class="slot empty" data-index="${i}" aria-label="${t('crucible.slot.label', { n })}"></button>`;
+          return `${plus}<button type="button" class="slot empty" data-index="${i}" aria-label="${t('crucible.slot.label', { n })}"><span class="slot-n" aria-hidden="true">${ROMAN[i] ?? n}</span></button>`;
         }
         const e = content.elements.get(id)!;
         return `${plus}<button type="button" class="slot filled" data-index="${i}" aria-label="${esc(t('crucible.slot.filled', { n, name: e.name }))}">
@@ -415,6 +454,7 @@ export class App {
 
     const inputs = this.filled();
     const can = this.game.canCraft(inputs);
+    this.el.crucible.dataset.fill = String(inputs.length);
     this.el.craft.disabled = !can || this.busy;
     this.el.clear.disabled = inputs.length === 0;
     this.el.tried.hidden = !(can && this.game.wasFailed(inputs));
@@ -422,7 +462,7 @@ export class App {
 
     const hint = this.game.currentHint();
     this.el.hintBanner.hidden = !hint;
-    if (hint) this.el.hintBanner.innerHTML = `<span aria-hidden="true">💡</span> ${esc(this.hintText(hint).join(' '))}`;
+    if (hint) this.el.hintBanner.innerHTML = `${icon('hint')}<span>${esc(this.hintText(hint).join(' '))}</span>`;
   }
 
   private renderTabs() {
@@ -456,7 +496,7 @@ export class App {
         const cls = ['el', ex ? 'exhausted' : '', hinted.has(e.id) ? 'hinted' : ''].filter(Boolean).join(' ');
         const label = t('list.add', { name: e.name }) + (ex ? `（${t('list.exhausted')}）` : '');
         return `<button type="button" class="${cls}" data-id="${e.id}" aria-label="${esc(label)}" title="${esc(e.desc)}">
-          <span class="emoji" aria-hidden="true">${e.emoji}</span><span class="name">${esc(e.name)}</span>${ex ? '<span class="check" aria-hidden="true">✓</span>' : ''}</button>`;
+          <span class="emoji" aria-hidden="true">${e.emoji}</span><span class="name">${esc(e.name)}</span>${ex ? icon('check', 'check') : ''}</button>`;
       })
       .join('');
   }
@@ -467,16 +507,16 @@ export class App {
     const e = r.output;
     const cat = this.game.content.categories.find((c) => c.id === e.category);
     const rewards = [
-      ...r.achievements.map((a) => `<li>${a.emoji} ${esc(t('discover.achievement', { name: a.name }))}</li>`),
-      r.hintsGained > 0 ? `<li>💡 ${t('discover.hints', { n: r.hintsGained })}</li>` : '',
+      ...r.achievements.map((a) => `<li><span aria-hidden="true">${a.emoji}</span>${esc(t('discover.achievement', { name: a.name }))}</li>`),
+      r.hintsGained > 0 ? `<li>${icon('hint')}${t('discover.hints', { n: r.hintsGained })}</li>` : '',
     ].join('');
     const d = this.el.dlgDiscover;
     d.innerHTML = `
       <div class="burst" aria-hidden="true"></div>
-      <p class="eyebrow" id="discover-title">${t('discover.title')}</p>
+      <p class="seal" id="discover-title"><span>${t('discover.title')}</span></p>
       <div class="big-emoji" aria-hidden="true">${e.emoji}</div>
       <h2 class="el-name">${esc(e.name)}</h2>
-      ${cat ? `<p class="cat">${cat.emoji} ${esc(cat.name)}</p>` : ''}
+      ${cat ? `<p class="cat"><span aria-hidden="true">${cat.emoji}</span> ${esc(cat.name)}</p>` : ''}
       <p class="desc">${esc(e.desc)}</p>
       ${rewards ? `<ul class="rewards">${rewards}</ul>` : ''}
       <form method="dialog"><button class="primary-btn" autofocus>${t('discover.ok')}</button></form>`;
@@ -512,7 +552,7 @@ export class App {
         body = `<button type="button" class="primary-btn" data-act="use" ${g.data.hints.available <= 0 ? 'disabled' : ''}>${t('hint.use')}</button>`;
       }
       d.innerHTML = `
-        <h2 id="hint-title">💡 ${t('hint.title')}</h2>
+        <h2 id="hint-title">${icon('hint')}${t('hint.title')}</h2>
         <p>${t('hint.remaining', { n: g.data.hints.available })}</p>
         <p class="muted small">${t('hint.progress', { n: remain })}</p>
         ${message ? `<p class="notice">${message}</p>` : ''}
@@ -539,13 +579,13 @@ export class App {
     const unlocked = list.filter((a) => g.isAchievementUnlocked(a.id)).length;
     const d = this.el.dlgAch;
     d.innerHTML = `
-      <h2 id="ach-title">🏆 ${t('achievements.title')}</h2>
+      <h2 id="ach-title">${icon('trophy')}${t('achievements.title')}</h2>
       <p class="muted">${t('achievements.count', { n: unlocked, total: list.length })}</p>
       <ul class="ach-list">${list
         .map((a) => {
           const on = g.isAchievementUnlocked(a.id);
           return `<li class="${on ? 'on' : 'off'}">
-            <span class="ach-emoji" aria-hidden="true">${on ? a.emoji : '🔒'}</span>
+            <span class="ach-emoji" aria-hidden="true">${on ? a.emoji : icon('lock')}</span>
             <span class="ach-text"><strong>${esc(a.name)}</strong><span>${esc(a.desc)}${a.reward.hints ? ` · ${t('achievements.reward', { n: a.reward.hints })}` : ''}</span></span>
             <span class="visually-hidden">${on ? '' : t('achievements.locked')}</span>
           </li>`;
@@ -558,17 +598,19 @@ export class App {
   private openSettings() {
     const d = this.el.dlgSettings;
     const g = this.game;
+    const soundLabel = () =>
+      g.data.settings.muted ? `${icon('soundOff')}${t('settings.off')}` : `${icon('soundOn')}${t('settings.on')}`;
     const fmtTime = (ms: number) => {
       const m = Math.floor(ms / 60000);
       const h = Math.floor(m / 60);
       return h > 0 ? t('time.hm', { h, m: m % 60 }) : t('time.m', { m });
     };
     d.innerHTML = `
-      <h2 id="settings-title">⚙️ ${t('settings.title')}</h2>
+      <h2 id="settings-title">${icon('gear')}${t('settings.title')}</h2>
       <section class="set-row">
         <span>${t('settings.sound')}</span>
-        <button type="button" class="ghost-btn small" data-act="sound" aria-pressed="${!g.data.settings.muted}">
-          ${g.data.settings.muted ? `🔇 ${t('settings.off')}` : `🔊 ${t('settings.on')}`}</button>
+        <button type="button" class="ghost-btn small with-icon" data-act="sound" aria-pressed="${!g.data.settings.muted}">
+          ${soundLabel()}</button>
       </section>
       <section>
         <h3>${t('settings.stats')}</h3>
@@ -605,7 +647,7 @@ export class App {
           g.setMuted(!g.data.settings.muted);
           this.sfx.muted = g.data.settings.muted;
           btn.setAttribute('aria-pressed', String(!g.data.settings.muted));
-          btn.textContent = g.data.settings.muted ? `🔇 ${t('settings.off')}` : `🔊 ${t('settings.on')}`;
+          btn.innerHTML = soundLabel();
           break;
         case 'copy': {
           const ta = $(d, '#export-code') as HTMLTextAreaElement;
