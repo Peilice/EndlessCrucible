@@ -181,7 +181,7 @@
 - { id: temple,       name: 神殿, emoji: 🏛️, category: craft, desc: 人們為天堂在地上蓋的房子。 }
 - { id: war,          name: 戰爭, emoji: ⚔️, category: craft, desc: 騎士與騎士刀劍相向。 }
 
-# ── 秘儀 ──
+# ── 奧祕 ──
 - { id: energy,            name: 能量, emoji: ✴️, category: arcane, desc: 火與火相加，比火更純粹。 }
 - { id: pressure,          name: 壓力, emoji: 🗜️, category: arcane, desc: 風擠著風，無處可逃。 }
 - { id: time,              name: 時間, emoji: ⏳, category: arcane, desc: 日月在大地上輪轉，便有了時間。 }

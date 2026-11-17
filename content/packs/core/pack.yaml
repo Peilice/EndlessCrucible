@@ -10,4 +10,4 @@ categories:
   - { id: plant,    name: 植物, emoji: 🌿 }
   - { id: creature, name: 生物, emoji: 🐾 }
   - { id: craft,    name: 器物, emoji: 🛠️ }
-  - { id: arcane,   name: 秘儀, emoji: ✨ }
+  - { id: arcane,   name: 奧祕, emoji: ✨ }

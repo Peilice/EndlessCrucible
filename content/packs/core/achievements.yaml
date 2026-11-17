@@ -21,7 +21,7 @@
 - { id: cat_plant,    name: 綠之守望, emoji: 🌿, desc: 發現所有植物元素。, condition: { type: category, category: plant },    reward: { hints: 2 } }
 - { id: cat_creature, name: 萬物之母, emoji: 🐾, desc: 發現所有生物元素。, condition: { type: category, category: creature }, reward: { hints: 2 } }
 - { id: cat_craft,    name: 文明之火, emoji: 🛠️, desc: 發現所有器物元素。, condition: { type: category, category: craft },    reward: { hints: 2 } }
-- { id: cat_arcane,   name: 秘儀洞悉, emoji: ✨, desc: 發現所有秘儀元素。, condition: { type: category, category: arcane },   reward: { hints: 2 } }
+- { id: cat_arcane,   name: 奧祕洞悉, emoji: ✨, desc: 發現所有奧祕元素。, condition: { type: category, category: arcane },   reward: { hints: 2 } }
 
 # ── 關鍵元素 ──
 - { id: el_life,        name: 生命之火花, emoji: 🧬, desc: 合成出生命。,     condition: { type: element, element: life },              reward: { hints: 1 } }
