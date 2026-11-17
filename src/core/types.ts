@@ -2,7 +2,7 @@ export type ElementId = string;
 
 /** 全域遊戲設定（content/game.yaml）。 */
 export interface GameConfig {
-  /** 練成台元素框數量。 */
+  /** 鍊成台元素框數量。 */
   slots: number;
   /** 一組配方最少材料數。 */
   minInputs: number;

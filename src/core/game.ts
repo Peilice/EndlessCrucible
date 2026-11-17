@@ -80,7 +80,7 @@ export class Game {
     return uses.every((r) => this.discoveredSet.has(r.output));
   }
 
-  // ---- 練成 ----
+  // ---- 鍊成 ----
 
   async craft(inputs: readonly ElementId[]): Promise<CraftResult> {
     if (!this.canCraft(inputs)) return { kind: 'invalid', reason: 'arity' };

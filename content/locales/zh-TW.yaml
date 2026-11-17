@@ -8,14 +8,14 @@ header.hint: 提示
 header.achievements: 成就
 header.settings: 設定
 
-crucible.title: 練成台
+crucible.title: 鍊成台
 crucible.slot.empty: 空
 crucible.slot.label: 第 {n} 格
 crucible.slot.filled: 第 {n} 格：{name}，點擊取出
-crucible.craft: 練成
+crucible.craft: 鍊成
 crucible.clear: 清空
 crucible.tried: 已試過
-crucible.help: 點選元素清單中的元素放入元素框，放入 2～3 個後按「練成」
+crucible.help: 點選元素清單中的元素放入元素框，放入 2～3 個後按「鍊成」
 crucible.fail: 無反應……
 crucible.failRepeat: 還是無反應
 crucible.known: 合成出 {name}
@@ -59,7 +59,7 @@ settings.sound: 音效
 settings.on: 開
 settings.off: 關
 settings.stats: 統計
-settings.attempts: 練成次數：{n}
+settings.attempts: 鍊成次數：{n}
 settings.playtime: 遊玩時間：{t}
 settings.export: 匯出存檔碼
 settings.exportHelp: 複製下方存檔碼，在其他裝置的「匯入」貼上即可搬移進度。

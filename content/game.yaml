@@ -1,5 +1,5 @@
 # 全域遊戲設定
-slots: 3          # 練成台元素框數
+slots: 3          # 鍊成台元素框數
 minInputs: 2      # 配方最少材料數
 maxInputs: 3      # 配方最多材料數（不可超過 slots）
 locale: zh-TW

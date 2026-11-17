@@ -5,7 +5,7 @@ import { testContent } from './testing';
 
 const setup = () => new Game(testContent().content);
 
-describe('練成', () => {
+describe('鍊成', () => {
   it('新發現、已知、失敗', async () => {
     const g = setup();
     const r1 = await g.craft(['b', 'a']);
