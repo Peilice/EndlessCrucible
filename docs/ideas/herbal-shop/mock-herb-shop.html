@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>方向 C：中藥行百子櫃</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Serif+TC:wght@700;900&display=swap" />
+<style>
+:root {
+  --lacquer: #2a1009; --wood: #5a2a17; --wood-2: #6e3620; --wood-hi: #8a4a2c;
+  --brass: #c9a24e; --brass-hi: #f0d488; --brass-lo: #7d5f22;
+  --label: #f3ecdc; --ink: #1d140f; --red: #b8322a; --jade: #2f5d50;
+  --kai: 'LXGW WenKai TC', 'KaiTi', 'BiauKai', serif; --ming: 'Noto Serif TC', serif;
+  --sans: system-ui, 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { font: 15px/1.5 var(--sans); color: var(--ink); background: var(--lacquer); overflow: hidden; }
+.app { display: grid; grid-template-columns: minmax(0, 1fr) minmax(380px, 46%); grid-template-rows: auto minmax(0, 1fr); block-size: 100dvh; }
+
+/* 匾額 */
+.plaque {
+  grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 0.55rem 1.4rem; background: linear-gradient(180deg, #1a0a05, #2a120a);
+  border-block-end: 4px solid #120603; box-shadow: 0 6px 16px -6px #000;
+}
+.plaque h1 {
+  margin: 0; padding: 0.15rem 1.4rem; border: 3px double var(--brass); background: #140704;
+  font: 900 1.9rem/1.2 var(--ming); letter-spacing: 0.5em; text-indent: 0.5em; color: var(--brass-hi);
+  text-shadow: 0 1px 0 #000, 0 0 14px #c9a24e55;
+}
+.plaque .sub { font: 400 0.95rem var(--kai); color: #c9b48a; letter-spacing: 0.15em; }
+.plaque .right { white-space: nowrap; display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem; color: #e8d9b6; font: 700 0.95rem var(--kai); }
+.plaque .right b { font: 900 1.4rem var(--ming); color: var(--brass-hi); }
+.tok { white-space: nowrap; min-block-size: 36px; padding: 0 0.8rem; border-radius: 18px; border: 1px solid var(--brass-lo); background: #0006; color: #e8d9b6; font: 700 0.9rem var(--kai); }
+.tok i { font-style: normal; color: var(--brass-hi); margin-inline-start: 0.3rem; }
+
+/* 櫃台：藥方箋 + 戥子 */
+.counter {
+  position: relative; display: grid; grid-template-rows: 1fr auto; justify-items: center; align-items: center; gap: 0.8rem;
+  padding: 1rem 1.4rem 1.2rem;
+  background:
+    linear-gradient(180deg, #0005, transparent 18%),
+    repeating-linear-gradient(178deg, #ffffff06 0 2px, transparent 2px 11px),
+    linear-gradient(180deg, var(--wood-2), var(--wood));
+}
+.desk { display: grid; grid-template-columns: auto auto; gap: 1.6rem; align-items: center; }
+.rx {
+  position: relative; inline-size: min(330px, 34vw); padding: 0.9rem 1rem 0.8rem; background: #f7f4ec;
+  box-shadow: 0 14px 26px -10px #000c; rotate: -1.2deg;
+}
+.rx h2 { margin: 0 0 0.4rem; display: flex; justify-content: space-between; font: 700 1.05rem var(--kai); color: var(--red); letter-spacing: 0.3em; border-block-end: 2px solid var(--red); padding-block-end: 0.2rem; }
+.rx h2 small { font: 400 0.8rem var(--kai); letter-spacing: 0.05em; }
+.rx-cols { display: grid; grid-template-columns: repeat(3, 1fr); border-inline: 1px solid var(--red); }
+.rx-col { display: grid; justify-items: center; align-content: center; gap: 0.3rem; min-block-size: 9.5rem; border-inline-end: 1px solid #b8322a88; padding-block: 0.4rem; }
+.rx-col:last-child { border: 0; }
+.rx-col .e { font-size: 2rem; }
+.rx-col .n { writing-mode: vertical-rl; font: 700 1.5rem/1 var(--kai); color: var(--ink); letter-spacing: 0.1em; }
+.rx-col.empty .n { color: #c9bfae; font-weight: 400; font-size: 1.1rem; }
+.rx-note { margin: 0.4rem 0 0; font: 400 0.8rem var(--kai); color: #6a5a4a; text-align: center; }
+
+/* 戥子（秤） */
+.scale { inline-size: min(250px, 24vw); }
+.scale svg { inline-size: 100%; display: block; overflow: visible; }
+.result-pack { display: flex; gap: 0.9rem; align-items: center; justify-content: center; }
+.pack {
+  position: relative; inline-size: 7.2rem; aspect-ratio: 1; display: grid; place-items: center; rotate: 3deg;
+  background: linear-gradient(135deg, #f1e7d0, #dccaa4); clip-path: polygon(50% 0, 100% 34%, 100% 100%, 0 100%, 0 34%);
+  box-shadow: 0 10px 20px -8px #000;
+}
+.pack::before { content: ''; position: absolute; inset: 34% 0 auto; block-size: 2px; background: #a0784a; }
+.pack::after { content: ''; position: absolute; inset: 0 auto 0 50%; inline-size: 2px; background: #b8322a; }
+.pack span { position: relative; z-index: 1; margin-block-start: 1.4rem; padding: 0.15rem 0.45rem; background: var(--red); color: #fff3e8; font: 700 1.05rem var(--kai); letter-spacing: 0.15em; }
+.pack-text { color: #f2e6cc; max-inline-size: 13rem; }
+.pack-text b { display: block; font: 900 1.6rem var(--ming); color: var(--brass-hi); }
+.pack-text p { margin: 0.2rem 0 0; font: 400 0.95rem var(--kai); }
+.pack-text em { font-style: normal; font: 700 0.75rem var(--sans); color: #fff; background: var(--red); padding: 0.1rem 0.4rem; }
+.acts { display: flex; gap: 0.7rem; align-items: center; }
+.mix { padding: 0.65rem 2.2rem; border: 0; border-radius: 6px; background: linear-gradient(180deg, var(--brass-hi), var(--brass) 45%, var(--brass-lo)); color: #2a1709; font: 900 1.5rem var(--ming); letter-spacing: 0.5em; text-indent: 0.5em; box-shadow: inset 0 1px 0 #fff8, 0 4px 0 #4d3812, 0 12px 22px -8px #000; }
+.clr { padding: 0.55rem 1.1rem; border-radius: 6px; border: 1px solid #c9a24e66; background: #0004; color: #e8d9b6; font: 700 0.95rem var(--kai); }
+
+/* 百子櫃 */
+.cabinet {
+  display: grid; grid-template-rows: auto auto 1fr; gap: 0.6rem; padding: 0.9rem 1rem 0;
+  background: linear-gradient(180deg, #3a170b, #2a1009); border-inline-start: 8px solid #170703;
+}
+.cab-top { display: flex; gap: 0.6rem; align-items: center; }
+.cab-top h2 { margin: 0; font: 900 1.25rem var(--ming); color: var(--brass-hi); letter-spacing: 0.3em; white-space: nowrap; }
+.cab-top .search { flex: 1; padding: 0.4rem 0.8rem; background: var(--label); color: #8a7a66; font: 400 0.9rem var(--kai); border-radius: 2px; }
+.cats { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.cats span { padding: 0.15rem 0.6rem; border: 1px solid #c9a24e55; color: #e0cfa8; font: 700 0.88rem var(--kai); border-radius: 2px; }
+.cats span.on { background: var(--brass); color: #2a1709; border-color: var(--brass-hi); }
+.drawers { overflow: auto; display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 5px; background: #170703; align-content: start; margin-block-end: 0.8rem; }
+.drawer {
+  position: relative; aspect-ratio: 1 / 0.86; display: grid; grid-template-rows: 1fr auto; justify-items: center; align-items: center; padding: 0.35rem 0.3rem 0.45rem;
+  background: linear-gradient(180deg, var(--wood-hi), var(--wood) 60%, #4a2010); box-shadow: inset 0 1px 0 #ffffff26, inset 0 -3px 0 #0004, inset 0 0 0 1px #0005;
+}
+.drawer .tag { display: flex; align-items: center; gap: 0.3rem; padding: 0.15rem 0.45rem; background: var(--label); box-shadow: 0 1px 2px #0008; font: 700 1rem var(--kai); color: var(--ink); white-space: nowrap; }
+.drawer .tag i { font-style: normal; font-size: 1rem; }
+.drawer .pull { inline-size: 22px; block-size: 13px; border: 2.5px solid var(--brass); border-block-start: 0; border-radius: 0 0 12px 12px; box-shadow: 0 2px 2px #0008; position: relative; }
+.drawer .pull::before { content: ''; position: absolute; inset: -5px 4px auto; block-size: 5px; background: var(--brass-hi); border-radius: 2px; }
+.drawer.new .tag { background: #fff; outline: 2px solid var(--red); }
+.drawer.done { filter: brightness(0.6) saturate(0.7); }
+.drawer.locked .tag { background: #3a1a0e; color: #6e4a36; box-shadow: none; }
+@media (max-width: 760px) {
+  body { overflow: auto; }
+  .app { grid-template-columns: 1fr; block-size: auto; }
+  .plaque { flex-wrap: wrap; }
+  .plaque h1 { font-size: 1.4rem; }
+  .plaque .sub { display: none; }
+  .desk { grid-template-columns: 1fr; justify-items: center; gap: 0.6rem; }
+  .rx { inline-size: min(320px, 86vw); }
+  .scale { display: none; }
+  .drawers { grid-template-columns: repeat(4, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="plaque">
+    <h1>無垠鍊成</h1>
+    <span class="sub">Endless Crucible</span>
+    <div class="right"><span>已發現 <b>14</b> / 196</span><button class="tok">提示<i>3</i></button><button class="tok">成就</button><button class="tok">設定</button></div>
+  </header>
+
+  <main class="counter">
+    <div class="desk">
+      <section class="rx" aria-label="藥方">
+        <h2>藥方 <small>放入 2～3 味</small></h2>
+        <div class="rx-cols">
+          <div class="rx-col"><span class="e">💧</span><span class="n">水</span></div>
+          <div class="rx-col"><span class="e">🌬️</span><span class="n">風</span></div>
+          <div class="rx-col empty"><span class="n">第三味</span></div>
+        </div>
+        <p class="rx-note">點選櫃上的抽屜，把元素寫進藥方</p>
+      </section>
+      <div class="scale" aria-hidden="true">
+        <svg viewBox="0 0 260 230">
+          <defs><linearGradient id="br" x1="0" x2="1"><stop offset="0" stop-color="#7d5f22"/><stop offset=".45" stop-color="#f0d488"/><stop offset="1" stop-color="#8f6c28"/></linearGradient></defs>
+          <path d="M150 8v26" stroke="#e0cfa8" stroke-width="2"/>
+          <circle cx="150" cy="38" r="5" fill="none" stroke="url(#br)" stroke-width="3"/>
+          <path d="M18 56L250 48" stroke="url(#br)" stroke-width="6" stroke-linecap="round"/>
+          <g fill="#2a1009" stroke="#f0d488" stroke-width="1"><circle cx="70" cy="54" r="1.6"/><circle cx="100" cy="53" r="1.6"/><circle cx="130" cy="52" r="1.6"/><circle cx="190" cy="50" r="1.6"/><circle cx="220" cy="49" r="1.6"/></g>
+          <path d="M210 50v40" stroke="#e0cfa8" stroke-width="1.5"/>
+          <path d="M200 90h20l-4 32h-12z" fill="url(#br)"/>
+          <path d="M28 58l-20 92M28 58l20 92M28 58v92" stroke="#e0cfa8" stroke-width="1.3"/>
+          <ellipse cx="28" cy="154" rx="40" ry="10" fill="url(#br)"/>
+          <ellipse cx="28" cy="151" rx="34" ry="6" fill="#5a3a12"/>
+          <path d="M10 150c6-12 30-14 40-2" fill="#f1e7d0"/>
+        </svg>
+      </div>
+    </div>
+    <div class="result-pack">
+      <div class="pack"><span>蒸氣</span></div>
+      <div class="pack-text"><em>新發現</em><b>♨️ 蒸氣</b><p>水在火的擁抱中升騰。</p></div>
+    </div>
+    <div class="acts"><button class="clr">清空</button><button class="mix">鍊成</button></div>
+  </main>
+
+  <aside class="cabinet">
+    <div class="cab-top"><h2>百子櫃</h2><div class="search">搜尋元素</div></div>
+    <div class="cats"><span class="on">全部</span><span>基礎</span><span>天象</span><span>地貌</span><span>礦物</span><span>植物</span><span>生物</span><span>器物</span><span>奧祕</span></div>
+    <div class="drawers">
+      <div class="drawer done"><span class="tag"><i>💧</i>水</span><span class="pull"></span></div>
+      <div class="drawer"><span class="tag"><i>🔥</i>火</span><span class="pull"></span></div>
+      <div class="drawer"><span class="tag"><i>🌍</i>土</span><span class="pull"></span></div>
+      <div class="drawer"><span class="tag"><i>🌬️</i>風</span><span class="pull"></span></div>
+      <div class="drawer new"><span class="tag"><i>♨️</i>蒸氣</span><span class="pull"></span></div>
+      <div class="drawer"><span class="tag"><i>🌫️</i>霧</span><span class="pull"></span></div>
+      <div class="drawer"><span class="tag"><i>💨</i>煙</span><span class="pull"></span></div>
+      <div class="drawer"><span class="tag"><i>☁️</i>雲</span><span class="pull"></span></div>
+      <div class="drawer"><span class="tag"><i>🌧️</i>雨</span><span class="pull"></span></div>
+      <div class="drawer"><span class="tag"><i>🟫</i>泥巴</span><span class="pull"></span></div>
+      <div class="drawer"><span class="tag"><i>🟧</i>熔岩</span><span class="pull"></span></div>
+      <div class="drawer"><span class="tag"><i>🟤</i>塵土</span><span class="pull"></span></div>
+      <div class="drawer"><span class="tag"><i>⚡</i>閃電</span><span class="pull"></span></div>
+      <div class="drawer"><span class="tag"><i>✴️</i>能量</span><span class="pull"></span></div>
+      <div class="drawer locked"><span class="tag">？</span><span class="pull"></span></div>
+      <div class="drawer locked"><span class="tag">？</span><span class="pull"></span></div>
+      <div class="drawer locked"><span class="tag">？</span><span class="pull"></span></div>
+      <div class="drawer locked"><span class="tag">？</span><span class="pull"></span></div>
+      <div class="drawer locked"><span class="tag">？</span><span class="pull"></span></div>
+      <div class="drawer locked"><span class="tag">？</span><span class="pull"></span></div>
+    </div>
+  </aside>
+</div>
+</body>
+</html>

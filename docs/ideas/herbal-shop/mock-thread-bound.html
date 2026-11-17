@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>方向 D：線裝古籍加朱批</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Serif+TC:wght@500;700;900&display=swap" />
+<style>
+:root {
+  --indigo: #1d2a45; --indigo-2: #131c31; --paper: #e6dcc0; --paper-2: #d9cba6;
+  --ink: #1a1612; --ink-2: #4b4236; --cinnabar: #c23a22; --rule: #8a7a5c;
+  --ming: 'Noto Serif TC', serif; --kai: 'LXGW WenKai TC', 'KaiTi', 'BiauKai', serif;
+  --sans: system-ui, 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+/* 底：藍布函套 */
+body {
+  font: 15px/1.5 var(--sans); color: var(--ink); overflow: hidden;
+  background:
+    repeating-linear-gradient(45deg, #ffffff06 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(-45deg, #00000018 0 1px, transparent 1px 4px),
+    radial-gradient(80% 70% at 50% 40%, #26365a, var(--indigo) 60%, var(--indigo-2));
+}
+.desk { block-size: 100dvh; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 0.8rem; padding: 0.9rem 1.6rem 1.2rem; }
+.bar { display: flex; justify-content: flex-end; gap: 0.5rem; align-items: center; color: #c7cfe0; font: 700 0.9rem var(--kai); }
+.bar b { font: 900 1.2rem var(--ming); color: #f0e6cc; margin-inline: 0.2rem; }
+.bar button { min-block-size: 34px; padding: 0 0.8rem; border: 1px solid #8a97b8; background: transparent; color: #e4e8f2; font: 700 0.9rem var(--kai); }
+.bar button i { font-style: normal; color: #ff8a70; margin-inline-start: 0.3rem; }
+
+/* 攤開的書：右頁先讀（直排由右至左），中縫為版心 */
+.book {
+  position: relative; display: grid; grid-template-columns: 1fr 3.2rem 1fr; min-block-size: 0;
+  background: var(--paper); box-shadow: 0 30px 50px -20px #000d, 0 0 0 1px #0004;
+  background-image:
+    linear-gradient(90deg, #0000 0 46%, #00000022 49.5%, #00000035 50%, #00000022 50.5%, #0000 54%),
+    radial-gradient(120% 90% at 50% 50%, transparent 60%, #8a6a3a33),
+    var(--noise, none);
+}
+.page { position: relative; margin: 1.1rem; border: 3px double var(--ink); padding: 0.9rem 1rem; display: grid; min-block-size: 0; }
+.right-page { grid-column: 3; grid-row: 1; }
+.left-page { grid-column: 1; grid-row: 1; }
+/* 版心：書名、魚尾、頁碼 */
+.center { grid-column: 2; grid-row: 1; margin-block: 1.1rem; border-block: 3px double var(--ink); display: grid; justify-items: center; align-content: start; gap: 0.5rem; padding-block: 0.8rem; }
+.center .fish { inline-size: 1.6rem; block-size: 0.9rem; background: var(--ink); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 45%, 0 100%); }
+.center .t { writing-mode: vertical-rl; font: 900 1.25rem var(--ming); letter-spacing: 0.3em; }
+.center .p { writing-mode: vertical-rl; font: 500 0.85rem var(--ming); color: var(--ink-2); margin-block-start: auto; }
+
+/* 右頁：鍊成 */
+.bench { writing-mode: vertical-rl; display: flex; flex-direction: column; gap: 0; align-items: stretch; overflow: hidden; }
+.col { border-block-start: 1px solid var(--rule); padding-block: 0.55rem; font: 500 1.05rem/1.8 var(--ming); }
+.col.head { font: 900 2.3rem/1.1 var(--ming); letter-spacing: 0.15em; padding-block: 0.2rem 0.9rem; border-block-start: 0; }
+.col.head small { font: 500 1rem var(--ming); color: var(--ink-2); letter-spacing: 0.05em; }
+.slots { display: flex; flex-direction: row; gap: 0.6rem; align-items: center; padding-block: 0.8rem; padding-inline: 0.4rem; border-block-start: 1px solid var(--rule); }
+.slot { inline-size: 4.4rem; block-size: 4.4rem; display: grid; place-items: center; border: 2px solid var(--ink); background: #efe6cd; writing-mode: horizontal-tb; }
+.slot span { font: 900 2.4rem/1 var(--ming); }
+.slot.empty { border-style: dashed; border-color: var(--rule); }
+.slot.empty span { font: 500 0.9rem var(--kai); color: var(--rule); writing-mode: vertical-rl; }
+.plus { font: 500 1.2rem var(--ming); color: var(--ink-2); }
+.seal {
+  writing-mode: horizontal-tb; flex: none; align-self: end; margin-block-start: auto; margin-inline: 0.8rem;
+  inline-size: 5.4rem; block-size: 5.4rem; display: grid; grid-template-columns: 1fr 1fr; place-items: center;
+  background: var(--cinnabar); color: #fbeee6; border: 0; border-radius: 4px; font: 900 1.9rem/1 var(--ming);
+  box-shadow: inset 0 0 0 3px #fbeee6, inset 0 0 0 6px var(--cinnabar), 0 6px 14px -6px #000a; rotate: -3deg; cursor: pointer;
+  direction: rtl;
+}
+.note { writing-mode: vertical-rl; padding-block: 0.7rem; border-block-start: 1px solid var(--rule); font: 400 1.15rem/1.7 var(--kai); color: var(--cinnabar); position: relative; }
+.note b { font: 700 1.6rem var(--kai); }
+.note .ring { display: inline-block; inline-size: 0.5em; block-size: 0.5em; border: 2px solid var(--cinnabar); border-radius: 50%; margin-block: 0.2em; }
+.clear { writing-mode: horizontal-tb; flex: none; align-self: start; margin-inline: 0.6rem; padding: 0.35rem 0.6rem; border: 1px solid var(--ink-2); background: transparent; font: 700 0.85rem var(--kai); color: var(--ink-2); }
+
+/* 左頁：目錄（已發現的元素） */
+.toc { writing-mode: vertical-rl; display: flex; flex-direction: column; overflow-x: auto; overflow-y: hidden; gap: 0; scrollbar-width: none; }
+.toc .head { font: 900 1.5rem var(--ming); letter-spacing: 0.4em; padding-block: 0 0.6rem; }
+.toc .search { font: 400 0.9rem var(--kai); color: var(--rule); padding-block: 0.5rem; border-block-start: 1px solid var(--rule); }
+.cat { display: flex; flex-direction: column; gap: 0; }
+.cat-name { font: 700 0.95rem var(--kai); color: #fbeee6; background: var(--ink); padding: 0.6rem 0.15rem; margin-block: 0.3rem; margin-inline: 0.4rem; align-self: start; }
+.cat-name.on { background: var(--cinnabar); }
+.item { position: relative; padding-block: 0.45rem; padding-inline: 0.5rem; border-block-start: 1px solid var(--rule); font: 700 1.25rem/1 var(--ming); letter-spacing: 0.15em; cursor: pointer; }
+.item small { font: 400 0.75rem var(--kai); color: var(--ink-2); letter-spacing: 0; display: block; margin-block-start: 0.4rem; }
+.item.new::before { content: ''; position: absolute; inset-block-start: 0.1rem; inset-inline-start: 0.05rem; inline-size: 0.9rem; block-size: 0.9rem; border: 2px solid var(--cinnabar); border-radius: 50%; }
+.item.new { color: var(--cinnabar); }
+.item.done { color: #9a8c70; }
+.marg { position: absolute; inset-block-end: 0.5rem; inset-inline-start: 0.8rem; writing-mode: horizontal-tb; font: 400 0.95rem var(--kai); color: var(--cinnabar); rotate: -4deg; }
+/* 書脊縫線（右側裝訂） */
+.stitch { position: absolute; inset-block: 0; inset-inline-end: 0.35rem; inline-size: 0.5rem; background: repeating-linear-gradient(180deg, transparent 0 14%, #1a1612 14% 15%, transparent 15% 28%); }
+.stitch::after { content: ''; position: absolute; inset-block: 0; inset-inline-start: 50%; inline-size: 2px; background: repeating-linear-gradient(180deg, transparent 0 13%, #f2ead5 13% 16%, transparent 16% 28%); }
+@media (max-width: 760px) {
+  body { overflow: auto; }
+  .desk { block-size: auto; padding: 0.6rem; }
+  .bar { flex-wrap: wrap; }
+  .book { grid-template-columns: 1fr; }
+  .center { display: none; }
+  .right-page, .left-page { grid-column: 1; }
+  .right-page { grid-row: 1; min-block-size: 24rem; }
+  .left-page { grid-row: 2; min-block-size: 18rem; }
+  .col.head { font-size: 1.8rem; }
+}
+</style>
+</head>
+<body>
+<div class="desk">
+  <div class="bar">已發現<b>14</b>／ 196<button>提示<i>3</i></button><button>成就</button><button>設定</button></div>
+  <div class="book">
+    <span class="stitch" aria-hidden="true"></span>
+
+    <section class="page right-page" aria-label="鍊成">
+      <div class="bench">
+        <div class="col head">無垠鍊成<br><small>Endless Crucible</small></div>
+        <div class="col">鍊成第十五回　擇二三味入鼎</div>
+        <div class="slots">
+          <div class="slot"><span>水</span></div>
+          <span class="plus">＋</span>
+          <div class="slot"><span>風</span></div>
+          <span class="plus">＋</span>
+          <div class="slot empty"><span>第三味</span></div>
+        </div>
+        <div class="note"><span class="ring"></span><b>蒸氣</b>　新得<br>水在火的擁抱中升騰。</div>
+        <div class="col" style="color:var(--ink-2)">天象之屬　水　火　合而得之</div>
+        <button class="clear">清空</button>
+        <button class="seal" aria-label="鍊成"><span>成</span><span>鍊</span></button>
+      </div>
+    </section>
+
+    <div class="center" aria-hidden="true"><span class="t">無垠鍊成</span><span class="fish"></span><span class="t" style="font-size:.9rem;letter-spacing:.2em">卷一</span><span class="p">十五</span></div>
+
+    <section class="page left-page" aria-label="目錄">
+      <div class="toc">
+        <div class="head">目錄</div>
+        <div class="search">檢索元素⋯⋯</div>
+        <div class="cat"><span class="cat-name on">全部</span></div>
+        <div class="cat"><span class="cat-name">基礎</span>
+          <span class="item done">水<small>💧</small></span><span class="item">火<small>🔥</small></span><span class="item">土<small>🌍</small></span><span class="item">風<small>🌬️</small></span></div>
+        <div class="cat"><span class="cat-name">天象</span>
+          <span class="item new">蒸氣<small>♨️</small></span><span class="item">霧<small>🌫️</small></span><span class="item">煙<small>💨</small></span><span class="item">雲<small>☁️</small></span><span class="item">雨<small>🌧️</small></span><span class="item">閃電<small>⚡</small></span></div>
+        <div class="cat"><span class="cat-name">地貌</span>
+          <span class="item">泥巴<small>🟫</small></span><span class="item">熔岩<small>🟧</small></span><span class="item">塵土<small>🟤</small></span></div>
+        <div class="cat"><span class="cat-name">奧祕</span>
+          <span class="item">能量<small>✴️</small></span></div>
+      </div>
+      <span class="marg">此味可再求之</span>
+    </section>
+  </div>
+</div>
+</body>
+</html>
