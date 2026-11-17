@@ -117,7 +117,7 @@ export function encodeSaveCode(save: SaveData): string {
 
 export function decodeSaveCode(code: string, content: Content): SaveData {
   const trimmed = code.trim().replace(/\s+/g, '');
-  if (!trimmed.startsWith(CODE_PREFIX)) throw new SaveError('這不是無盡坩堝的存檔碼');
+  if (!trimmed.startsWith(CODE_PREFIX)) throw new SaveError('這不是無垠鍊成的存檔碼');
   let parsed: unknown;
   try {
     parsed = JSON.parse(fromBase64(trimmed.slice(CODE_PREFIX.length)));
