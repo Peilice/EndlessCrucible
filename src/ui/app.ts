@@ -50,6 +50,56 @@ const SIGIL = `<svg class="sigil" viewBox="-14 -14 228 228" aria-hidden="true" f
   </g>
 </svg>`;
 
+/** 坩堝：鑄鐵鍋身、銅邊鍋口裡的熔液、兩側提耳、三支短腳，底下燒著炭火。 */
+const CRUCIBLE = `<svg class="pot" viewBox="0 0 400 270" focusable="false">
+  <defs>
+    <linearGradient id="cr-iron" x1="0" x2="1">
+      <stop offset="0" stop-color="#22170f"/><stop offset=".26" stop-color="#5a4330"/>
+      <stop offset=".46" stop-color="#36271a"/><stop offset="1" stop-color="#0f0a06"/>
+    </linearGradient>
+    <linearGradient id="cr-rim" x1="0" x2="1">
+      <stop offset="0" stop-color="#3a2817"/><stop offset=".28" stop-color="#c79a55"/>
+      <stop offset=".48" stop-color="#f6d896"/><stop offset=".72" stop-color="#a87c3e"/><stop offset="1" stop-color="#2e1f12"/>
+    </linearGradient>
+    <radialGradient id="cr-melt" cx=".5" cy=".3" r=".75">
+      <stop offset="0" stop-color="#fff3cc"/><stop offset=".3" stop-color="#ffbf55"/>
+      <stop offset=".7" stop-color="#e4642c"/><stop offset="1" stop-color="#6e240c"/>
+    </radialGradient>
+    <radialGradient id="cr-fire" cx=".5" cy="1" r=".95">
+      <stop offset="0" stop-color="#ffe09a"/><stop offset=".38" stop-color="#ff8a33"/>
+      <stop offset="1" stop-color="#e4642c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cr-shine" cx=".28" cy=".32" r=".45">
+      <stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse class="heat" cx="200" cy="256" rx="160" ry="20" fill="url(#cr-fire)"/>
+  <g class="flames" fill="url(#cr-fire)">
+    <path d="M146 262c-12-15-5-32 8-42 0 12 8 17 10 27 3-8 9-12 9-21 10 13 10 30 0 36z"/>
+    <path d="M190 264c-15-19-6-40 9-53 0 15 11 21 13 34 4-11 11-15 11-26 13 17 13 36 0 45z"/>
+    <path d="M238 262c-9-13-3-28 8-36 1 11 7 15 9 24 3-7 7-11 7-18 10 11 10 26 0 30z"/>
+  </g>
+  <g fill="#120c08" stroke="#5a4330" stroke-width="2" stroke-linejoin="round">
+    <path d="M122 210l-16 42h18l13-38z"/>
+    <path d="M278 210l16 42h-18l-13-38z"/>
+    <path d="M192 220v36h16v-36z"/>
+  </g>
+  <g fill="none" stroke="#6b5132" stroke-width="10" stroke-linecap="round">
+    <path d="M60 74c-36-6-44 46-6 54"/>
+    <path d="M340 74c36-6 44 46 6 54"/>
+  </g>
+  <path d="M52 48C38 122 70 198 138 224h124c68-26 100-102 86-176z" fill="url(#cr-iron)" stroke="#6b5132" stroke-width="2"/>
+  <path d="M52 48C38 122 70 198 138 224h124c68-26 100-102 86-176z" fill="url(#cr-shine)"/>
+  <path d="M50 116c64 22 236 22 300 0" fill="none" stroke="#c79a55" stroke-opacity=".55" stroke-width="4"/>
+  <path d="M52 124c64 22 232 22 296 0" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="2"/>
+  <g class="emblem" fill="none" stroke="#e0ad4f" stroke-width="2.2">
+    <circle cx="200" cy="178" r="21"/><path d="M200 161l15 26h-30z"/><path d="M186 178h28"/>
+  </g>
+  <ellipse cx="200" cy="48" rx="156" ry="30" fill="url(#cr-rim)"/>
+  <ellipse cx="200" cy="46" rx="140" ry="21" fill="#0b0704"/>
+  <ellipse class="melt" cx="200" cy="51" rx="132" ry="16" fill="url(#cr-melt)"/>
+</svg>`;
+
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI'];
 
 function esc(s: string): string {
@@ -82,6 +132,9 @@ export class App {
 
   private el!: {
     progressText: HTMLElement;
+    progressN: HTMLElement;
+    progressTotal: HTMLElement;
+    libCount: HTMLElement;
     progressFill: HTMLElement;
     hintCount: HTMLElement;
     crucible: HTMLElement;
@@ -116,6 +169,9 @@ export class App {
     const r = this.root;
     this.el = {
       progressText: $(r, '#progress-text'),
+      progressN: $(r, '#progress-n'),
+      progressTotal: $(r, '#progress-total'),
+      libCount: $(r, '#lib-count'),
       progressFill: $(r, '#progress-fill'),
       hintCount: $(r, '#hint-count'),
       crucible: $(r, '#crucible'),
@@ -154,22 +210,25 @@ export class App {
       <h1>${t('app.title')}</h1>
       <span class="subtitle" lang="en">${t('app.subtitle')}</span>
     </div>
-    <div class="progress">
-      <span id="progress-text"></span>
+    <div class="tally">
+      <p class="count">
+        <span class="visually-hidden" id="progress-text"></span>
+        <span class="count-vis" aria-hidden="true"><b id="progress-n"></b><span id="progress-total"></span></span>
+      </p>
       <div class="bar" aria-hidden="true"><div id="progress-fill"></div></div>
+      <nav class="actions" aria-label="${t('header.settings')}">
+        <button type="button" id="btn-hint" class="icon-btn">
+          ${icon('hint')}<span class="visually-hidden">${t('header.hint')}</span>
+          <span class="badge" id="hint-count"></span>
+        </button>
+        <button type="button" id="btn-ach" class="icon-btn">
+          ${icon('trophy')}<span class="visually-hidden">${t('header.achievements')}</span>
+        </button>
+        <button type="button" id="btn-settings" class="icon-btn">
+          ${icon('gear')}<span class="visually-hidden">${t('header.settings')}</span>
+        </button>
+      </nav>
     </div>
-    <nav class="actions" aria-label="${t('header.settings')}">
-      <button type="button" id="btn-hint" class="chip-btn">
-        ${icon('hint')}<span class="label">${t('header.hint')}</span>
-        <span class="badge" id="hint-count"></span>
-      </button>
-      <button type="button" id="btn-ach" class="chip-btn">
-        ${icon('trophy')}<span class="label">${t('header.achievements')}</span>
-      </button>
-      <button type="button" id="btn-settings" class="chip-btn">
-        ${icon('gear')}<span class="label">${t('header.settings')}</span>
-      </button>
-    </nav>
   </header>
 
   <main class="layout">
@@ -178,9 +237,8 @@ export class App {
       <div class="crucible" id="crucible" data-fill="0">
         ${SIGIL}
         <div class="slots" id="slots"></div>
-        <div class="bowl" aria-hidden="true">
-          <div class="bowl-glow"></div>
-          <div class="liquid"></div>
+        <div class="pot-wrap" aria-hidden="true">
+          ${CRUCIBLE}
           <div class="bubbles"><i></i><i></i><i></i><i></i><i></i></div>
         </div>
         <div class="result" id="result"></div>
@@ -195,7 +253,10 @@ export class App {
     </section>
 
     <section class="library" aria-labelledby="lib-title">
-      <h2 id="lib-title" class="visually-hidden">${t('list.title')}</h2>
+      <div class="lib-head">
+        <h2 id="lib-title">${t('list.title')}</h2>
+        <span class="lib-count" id="lib-count"></span>
+      </div>
       <div class="lib-tools">
         <input type="search" id="search" placeholder="${t('list.search')}" aria-label="${t('list.search')}" autocomplete="off" />
         <button type="button" id="btn-sort" class="ghost-btn small"></button>
@@ -433,6 +494,9 @@ export class App {
     const n = this.game.discoveredCount;
     const total = this.game.totalCount;
     this.el.progressText.textContent = t('header.progress', { n, total });
+    this.el.progressN.textContent = String(n);
+    this.el.progressTotal.textContent = t('header.progressTotal', { total });
+    this.el.libCount.textContent = t('list.count', { n });
     this.el.progressFill.style.inlineSize = `${(n / total) * 100}%`;
     this.el.hintCount.textContent = String(this.game.data.hints.available);
   }

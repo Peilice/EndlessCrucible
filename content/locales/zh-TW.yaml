@@ -4,6 +4,7 @@
 app.title: 無垠鍊成
 app.subtitle: Endless Crucible
 header.progress: 已發現 {n} / {total}
+header.progressTotal: 已發現 / {total}
 header.hint: 提示
 header.achievements: 成就
 header.settings: 設定
@@ -21,7 +22,8 @@ crucible.failRepeat: 還是無反應
 crucible.known: 合成出 {name}
 crucible.full: 元素框已滿
 
-list.title: 元素
+list.title: 藥櫃
+list.count: "{n} 種元素"
 list.search: 搜尋元素
 list.all: 全部
 list.sort.order: 依發現順序
