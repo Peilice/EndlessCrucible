@@ -1,0 +1,28 @@
+{
+  "name": "endless-crucible",
+  "version": "0.1.0",
+  "description": "無盡坩堝 Endless Crucible — 元素合成網頁遊戲",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "validate": "vite-node scripts/validate.ts",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run validate && npm test"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vite-node": "^6.0.0",
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^5.1.0",
+    "yaml": "^2.9.1"
+  },
+  "private": true
+}

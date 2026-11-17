@@ -1,0 +1,80 @@
+# 介面文字（繁體中文）
+# {name} 形式為代入參數
+
+app.title: 無盡坩堝
+app.subtitle: Endless Crucible
+header.progress: 已發現 {n} / {total}
+header.hint: 提示
+header.achievements: 成就
+header.settings: 設定
+
+crucible.title: 練成台
+crucible.slot.empty: 空
+crucible.slot.label: 第 {n} 格
+crucible.slot.filled: 第 {n} 格：{name}，點擊取出
+crucible.craft: 練成
+crucible.clear: 清空
+crucible.tried: 已試過
+crucible.help: 點選元素清單中的元素放入元素框，放入 2～3 個後按「練成」
+crucible.fail: 無反應……
+crucible.failRepeat: 還是無反應
+crucible.known: 合成出 {name}
+crucible.full: 元素框已滿
+
+list.title: 元素
+list.search: 搜尋元素
+list.all: 全部
+list.sort.order: 依發現順序
+list.sort.name: 依名稱
+list.empty: 沒有符合的元素
+list.exhausted: 已用盡
+list.add: 放入 {name}
+
+discover.title: 新發現！
+discover.ok: 太好了
+discover.achievement: 解鎖成就：{name}
+discover.hints: 獲得 {n} 次提示
+
+hint.title: 提示
+hint.remaining: 剩餘提示：{n} 次
+hint.progress: 再發現 {n} 個新元素可獲得 1 次提示
+hint.use: 使用 1 次提示
+hint.none: 提示次數不足
+hint.noCandidates: 目前沒有可以提示的配方
+hint.level1: 「{a}」還藏著一個未知的反應……
+hint.levelInputs: 試試看：{list} + ？
+hint.levelFull: 完整配方：{list}
+hint.output: 產物：{name}
+hint.more: 揭露更多
+hint.close: 關閉
+
+achievements.title: 成就
+achievements.count: 已解鎖 {n} / {total}
+achievements.locked: 尚未解鎖
+achievements.reward: 獎勵 {n} 次提示
+achievements.close: 關閉
+
+settings.title: 設定
+settings.sound: 音效
+settings.on: 開
+settings.off: 關
+settings.stats: 統計
+settings.attempts: 練成次數：{n}
+settings.playtime: 遊玩時間：{t}
+settings.export: 匯出存檔碼
+settings.exportHelp: 複製下方存檔碼，在其他裝置的「匯入」貼上即可搬移進度。
+settings.copy: 複製
+settings.copied: 已複製
+settings.import: 匯入存檔碼
+settings.importPlaceholder: 貼上存檔碼
+settings.importConfirm: 匯入（會覆蓋目前進度）
+settings.imported: 匯入成功
+settings.reset: 重置進度
+settings.resetConfirm: 確定要清除所有進度嗎？此動作無法復原。
+settings.resetYes: 確定重置
+settings.resetNo: 取消
+settings.close: 關閉
+settings.version: 版本 {v}
+
+time.hm: "{h} 小時 {m} 分"
+time.m: "{m} 分"

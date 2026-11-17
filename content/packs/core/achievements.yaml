@@ -1,0 +1,33 @@
+# 成就
+# condition.type：
+#   count    — 發現數達到 n
+#   complete — 全部發現
+#   category — 某分類全部發現（category: <分類 id>）
+#   element  — 發現指定元素（element: <元素 id>）
+# reward.hints：解鎖時獎勵的提示次數
+
+# ── 發現數 ──
+- { id: count_10,  name: 初窺門徑, emoji: 🕯️, desc: 發現 10 種元素。,  condition: { type: count, n: 10 },  reward: { hints: 1 } }
+- { id: count_25,  name: 煉金學徒, emoji: 📜, desc: 發現 25 種元素。,  condition: { type: count, n: 25 },  reward: { hints: 1 } }
+- { id: count_50,  name: 熟練工匠, emoji: ⚒️, desc: 發現 50 種元素。,  condition: { type: count, n: 50 },  reward: { hints: 2 } }
+- { id: count_100, name: 煉金大師, emoji: 🏆, desc: 發現 100 種元素。, condition: { type: count, n: 100 }, reward: { hints: 2 } }
+- { id: count_150, name: 萬象之主, emoji: 👁️, desc: 發現 150 種元素。, condition: { type: count, n: 150 }, reward: { hints: 3 } }
+- { id: complete,  name: 萬物歸一, emoji: ☯️, desc: 發現所有元素。,   condition: { type: complete } }
+
+# ── 分類全收集 ──
+- { id: cat_sky,      name: 觀天者,   emoji: ☁️, desc: 發現所有天象元素。, condition: { type: category, category: sky },      reward: { hints: 2 } }
+- { id: cat_land,     name: 大地行者, emoji: ⛰️, desc: 發現所有地貌元素。, condition: { type: category, category: land },     reward: { hints: 2 } }
+- { id: cat_mineral,  name: 礦脈之心, emoji: 💎, desc: 發現所有礦物元素。, condition: { type: category, category: mineral },  reward: { hints: 2 } }
+- { id: cat_plant,    name: 綠之守望, emoji: 🌿, desc: 發現所有植物元素。, condition: { type: category, category: plant },    reward: { hints: 2 } }
+- { id: cat_creature, name: 萬物之母, emoji: 🐾, desc: 發現所有生物元素。, condition: { type: category, category: creature }, reward: { hints: 2 } }
+- { id: cat_craft,    name: 文明之火, emoji: 🛠️, desc: 發現所有器物元素。, condition: { type: category, category: craft },    reward: { hints: 2 } }
+- { id: cat_arcane,   name: 秘儀洞悉, emoji: ✨, desc: 發現所有秘儀元素。, condition: { type: category, category: arcane },   reward: { hints: 2 } }
+
+# ── 關鍵元素 ──
+- { id: el_life,        name: 生命之火花, emoji: 🧬, desc: 合成出生命。,     condition: { type: element, element: life },              reward: { hints: 1 } }
+- { id: el_human,       name: 泥土中的人, emoji: 🧑, desc: 合成出人類。,     condition: { type: element, element: human },             reward: { hints: 1 } }
+- { id: el_gold,        name: 點石成金,   emoji: 🪙, desc: 合成出黃金。,     condition: { type: element, element: gold },              reward: { hints: 1 } }
+- { id: el_dragon,      name: 龍之誕生,   emoji: 🐉, desc: 合成出龍。,       condition: { type: element, element: dragon },            reward: { hints: 1 } }
+- { id: el_stone,       name: 賢者之石,   emoji: 🔴, desc: 合成出賢者之石。, condition: { type: element, element: philosopher_stone }, reward: { hints: 2 } }
+- { id: el_immortality, name: 永恆,       emoji: ♾️, desc: 合成出不朽。,     condition: { type: element, element: immortality },       reward: { hints: 1 } }
+- { id: el_creation,    name: 創世紀,     emoji: 🌟, desc: 合成出創世。,     condition: { type: element, element: creation },          reward: { hints: 1 } }

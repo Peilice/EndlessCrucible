@@ -1,0 +1,13 @@
+name: 核心元素
+# 開局即擁有的元素
+bases: [water, fire, earth, air]
+# 分類（元素清單的分頁依此順序）
+categories:
+  - { id: base,     name: 基礎, emoji: ⚛️ }
+  - { id: sky,      name: 天象, emoji: ☁️ }
+  - { id: land,     name: 地貌, emoji: ⛰️ }
+  - { id: mineral,  name: 礦物, emoji: 💎 }
+  - { id: plant,    name: 植物, emoji: 🌿 }
+  - { id: creature, name: 生物, emoji: 🐾 }
+  - { id: craft,    name: 器物, emoji: 🛠️ }
+  - { id: arcane,   name: 秘儀, emoji: ✨ }

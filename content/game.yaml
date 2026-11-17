@@ -1,0 +1,10 @@
+# 全域遊戲設定
+slots: 3          # 練成台元素框數
+minInputs: 2      # 配方最少材料數
+maxInputs: 3      # 配方最多材料數（不可超過 slots）
+locale: zh-TW
+packs:            # 依序載入的內容包（content/packs/<id>/）
+  - core
+hints:
+  initial: 3        # 開局提示次數
+  perDiscoveries: 5 # 每發現幾個新元素 +1 次提示
