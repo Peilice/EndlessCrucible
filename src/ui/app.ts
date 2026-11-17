@@ -180,6 +180,7 @@ export class App {
     el.craft.addEventListener('click', () => void this.craft());
     el.clear.addEventListener('click', () => {
       this.slots.fill(null);
+      this.clearResult();
       this.renderBench();
     });
     el.slots.addEventListener('click', (e) => {
@@ -189,6 +190,7 @@ export class App {
       if (this.slots[i]) {
         this.slots[i] = null;
         this.sfx.tick();
+        this.clearResult();
         this.renderBench();
       }
     });
@@ -289,7 +291,14 @@ export class App {
     }
     this.slots[i] = id;
     this.sfx.tick();
+    this.clearResult();
     this.renderBench();
+  }
+
+  /** 元素框內容一變動，就清掉上一次的鍊成結果，避免和新的組合混淆。 */
+  private clearResult() {
+    this.el.result.className = 'result';
+    this.el.result.innerHTML = '';
   }
 
   private filled(): ElementId[] {
