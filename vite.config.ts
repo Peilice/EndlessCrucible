@@ -23,7 +23,7 @@ export default defineConfig({
     yamlPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon.svg'],
+      includeAssets: ['icon.svg', 'apple-touch-icon-v2.png'],
       manifest: {
         name: '無垠鍊成 Endless Crucible',
         short_name: '無垠鍊成',
@@ -34,9 +34,9 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'any',
         icons: [
-          { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: 'icon-v2-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icon-v2-512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'icon-v2-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
           { src: 'icon.svg', sizes: 'any', type: 'image/svg+xml' },
         ],
       },
