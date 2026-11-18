@@ -337,16 +337,24 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
 .pot .flames path { transform-box: fill-box; transform-origin: 50% 100%; animation: flicker 1.6s ease-in-out infinite alternate; }
 .pot .flames path:nth-child(2) { animation-duration: 1.2s; animation-delay: -0.4s; }
 .pot .flames path:nth-child(3) { animation-duration: 1.9s; animation-delay: -0.9s; }
-.pot .emblem { opacity: 0.55; transition: opacity 0.5s, filter 0.5s; }
+.pot .emblem { opacity: 0.35; transition: opacity 0.5s, filter 0.5s, stroke 0.5s; }
+.pot .lip-glow { stroke-opacity: 0.25; transition: stroke-opacity 0.5s var(--ease-out); }
+.pot .under { opacity: 0.6; transition: opacity 0.5s var(--ease-out); }
 .crucible[data-fill='1'] .pot .melt { opacity: 0.65; }
 .crucible[data-fill='2'] .pot .melt,
 .crucible[data-fill='3'] .pot .melt { opacity: 0.95; }
 .crucible[data-fill='2'] .pot .heat,
 .crucible[data-fill='3'] .pot .heat { opacity: 0.85; }
+.crucible[data-fill='2'] .pot .lip-glow,
+.crucible[data-fill='3'] .pot .lip-glow { stroke-opacity: 0.5; }
+.crucible[data-fill='2'] .pot .under,
+.crucible[data-fill='3'] .pot .under { opacity: 0.9; }
 .crucible.brewing .pot .melt { opacity: 1; animation: glow-pulse 0.42s ease-in-out infinite alternate; }
 .crucible.brewing .pot .heat { opacity: 1; }
 .crucible.brewing .pot .flames path { animation-duration: 0.25s; }
-.crucible.brewing .pot .emblem { opacity: 1; filter: drop-shadow(0 0 4px #f6cf7a); }
+.crucible.brewing .pot .emblem { opacity: 1; stroke: #f6cf7a; filter: drop-shadow(0 0 3px #ff9a3c); }
+.crucible.brewing .pot .lip-glow { stroke-opacity: 0.8; }
+.crucible.brewing .pot .under { opacity: 1; }
 
 .bubbles { position: absolute; inset: 4% 22% auto; block-size: 14%; pointer-events: none; }
 .bubbles i {

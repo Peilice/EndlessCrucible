@@ -50,54 +50,119 @@ const SIGIL = `<svg class="sigil" viewBox="-14 -14 228 228" aria-hidden="true" f
   </g>
 </svg>`;
 
-/** 坩堝：鑄鐵鍋身、銅邊鍋口裡的熔液、兩側提耳、三支短腳，底下燒著炭火。 */
+/**
+ * 坩堝：手工鍛打的老鐵鍋——鍛痕與煙燻、厚捲邊鍋口被熔液照亮、兩道鉚釘鐵箍、
+ * 一圈刻上去的煉金符號、兩側掛環；鍋腳踩在石砌火塘上，底下是交疊柴薪的火。
+ */
+const RUNES = `<g transform="translate(98 150.2)"><circle r="6.5"/><circle r="1.2"/></g><g transform="translate(135.4 154.3)"><circle cy="-1" r="4.5"/><path d="M-4.5-9a4.5 4 0 0 0 9 0M0 3.5v6M-3 7h6"/></g><g transform="translate(172.8 156.5)"><path d="M0-9l6.5 10h-13zM0 1v8M-3.5 5.5h7"/></g><g transform="translate(227.2 156.5)"><circle r="6.5"/><path d="M-6.5 0h13"/></g><g transform="translate(264.6 154.3)"><path d="M2-7a7 7 0 1 0 0 14a5.5 5.5 0 1 1 0-14z"/></g><g transform="translate(302 150.2)"><path d="M0-8l7 12h-14zM-5.5 0h11"/></g><g transform="translate(200 161)"><circle r="15"/><circle r="11" stroke-dasharray="2 2.6"/><path d="M0-8l7 12h-14z"/><circle cy="1" r="2.4"/></g>`;
+const POT_BODY = 'M74 60C58 84 40 112 44 152c4 50 68 82 156 82s152-32 156-82c4-40-14-68-30-92z';
 const CRUCIBLE = `<svg class="pot" viewBox="0 0 400 270" focusable="false">
   <defs>
+    <clipPath id="cr-body"><path d="${POT_BODY}"/></clipPath>
     <linearGradient id="cr-iron" x1="0" x2="1">
-      <stop offset="0" stop-color="#22170f"/><stop offset=".26" stop-color="#5a4330"/>
-      <stop offset=".46" stop-color="#36271a"/><stop offset="1" stop-color="#0f0a06"/>
+      <stop offset="0" stop-color="#0d0906"/><stop offset=".22" stop-color="#2f241b"/>
+      <stop offset=".38" stop-color="#40301f"/><stop offset=".62" stop-color="#241a10"/><stop offset="1" stop-color="#080503"/>
     </linearGradient>
-    <linearGradient id="cr-rim" x1="0" x2="1">
-      <stop offset="0" stop-color="#3a2817"/><stop offset=".28" stop-color="#c79a55"/>
-      <stop offset=".48" stop-color="#f6d896"/><stop offset=".72" stop-color="#a87c3e"/><stop offset="1" stop-color="#2e1f12"/>
+    <linearGradient id="cr-soot" x1="0" y1="0" x2="0" y2="1">
+      <stop offset=".45" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".75"/>
     </linearGradient>
-    <radialGradient id="cr-melt" cx=".5" cy=".3" r=".75">
-      <stop offset="0" stop-color="#fff3cc"/><stop offset=".3" stop-color="#ffbf55"/>
-      <stop offset=".7" stop-color="#e4642c"/><stop offset="1" stop-color="#6e240c"/>
+    <linearGradient id="cr-lip" x1="0" x2="1">
+      <stop offset="0" stop-color="#140d08"/><stop offset=".3" stop-color="#4a3826"/>
+      <stop offset=".5" stop-color="#5b4430"/><stop offset=".75" stop-color="#2c2016"/><stop offset="1" stop-color="#0d0805"/>
+    </linearGradient>
+    <radialGradient id="cr-melt" cx=".5" cy=".35" r=".7">
+      <stop offset="0" stop-color="#ffe7a8"/><stop offset=".35" stop-color="#f3a442"/>
+      <stop offset=".75" stop-color="#c2501f"/><stop offset="1" stop-color="#4a1808"/>
     </radialGradient>
     <radialGradient id="cr-fire" cx=".5" cy="1" r=".95">
       <stop offset="0" stop-color="#ffe09a"/><stop offset=".38" stop-color="#ff8a33"/>
       <stop offset="1" stop-color="#e4642c" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="cr-shine" cx=".28" cy=".32" r=".45">
-      <stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    <radialGradient id="cr-under" cx=".5" cy="1" r=".6">
+      <stop offset="0" stop-color="#ff8a33" stop-opacity=".55"/><stop offset="1" stop-color="#ff8a33" stop-opacity="0"/>
     </radialGradient>
+    <linearGradient id="cr-wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a3020"/><stop offset="1" stop-color="#1a0f08"/>
+    </linearGradient>
+    <linearGradient id="cr-stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4b4036"/><stop offset="1" stop-color="#1b1612"/>
+    </linearGradient>
+    <filter id="cr-hammer" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".055 .09" numOctaves="3" seed="7"/>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.4 1.25"/>
+    </filter>
+    <filter id="cr-pit" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3"/>
+      <feColorMatrix values="0 0 0 0 .55  0 0 0 0 .42  0 0 0 0 .3  0 0 0 -3 1.55"/>
+    </filter>
+    <filter id="cr-wobble"><feTurbulence baseFrequency=".035" numOctaves="2" seed="11"/><feDisplacementMap in="SourceGraphic" scale="3.5"/></filter>
   </defs>
-  <ellipse class="heat" cx="200" cy="256" rx="160" ry="20" fill="url(#cr-fire)"/>
+
+  <ellipse class="heat" cx="200" cy="252" rx="170" ry="24" fill="url(#cr-fire)"/>
+  <g stroke="#120a05" stroke-width="1.5">
+    <path d="M96 252l124-30c6-1.5 9 9 3 11L101 264c-7 2-11-10-5-12z" fill="url(#cr-wood)"/>
+    <path d="M304 252l-124-30c-6-1.5-9 9-3 11l122 31c7 2 11-10 5-12z" fill="url(#cr-wood)"/>
+    <ellipse cx="98" cy="258" rx="5.5" ry="6.5" fill="#6b4a2c"/><ellipse cx="302" cy="258" rx="5.5" ry="6.5" fill="#6b4a2c"/>
+  </g>
   <g class="flames" fill="url(#cr-fire)">
-    <path d="M146 262c-12-15-5-32 8-42 0 12 8 17 10 27 3-8 9-12 9-21 10 13 10 30 0 36z"/>
-    <path d="M190 264c-15-19-6-40 9-53 0 15 11 21 13 34 4-11 11-15 11-26 13 17 13 36 0 45z"/>
-    <path d="M238 262c-9-13-3-28 8-36 1 11 7 15 9 24 3-7 7-11 7-18 10 11 10 26 0 30z"/>
+    <path d="M160 266c-14-12-12-30 0-42 0 11 7 15 9 24 3-11 10-17 9-30 12 13 16 34 4 48z"/>
+    <path d="M214 266c-12-14-9-30 3-42-1 12 6 15 8 23 3-9 7-13 7-22 12 14 14 31 2 41z"/>
+    <path d="M150 256c-10-10-9-22-1-31-1 9 5 11 6 18 2-9 7-14 6-24 8 9 13 24 6 37z"/>
+    <path d="M176 258c-13-14-11-32 0-45 0 10 6 14 8 22 3-14 11-20 10-34 13 16 18 40 6 57z"/>
+    <path d="M210 258c-10-12-8-27 3-37-1 11 5 13 7 20 2-8 6-11 6-19 10 12 12 27 2 36z"/>
+    <path d="M238 256c-7-9-6-19 1-26 0 7 4 9 5 14 2-6 5-9 5-15 7 9 9 20 1 27z"/>
   </g>
-  <g fill="#120c08" stroke="#5a4330" stroke-width="2" stroke-linejoin="round">
-    <path d="M122 210l-16 42h18l13-38z"/>
-    <path d="M278 210l16 42h-18l-13-38z"/>
-    <path d="M192 220v36h16v-36z"/>
+
+  <g fill="#0f0a06" stroke="#3a2c1f" stroke-width="1.5" stroke-linejoin="round">
+    <path d="M118 214c-2 14-8 26-18 34 6 3 18 3 24 0 2-10 6-20 12-28z"/>
+    <path d="M282 214c2 14 8 26 18 34-6 3-18 3-24 0-2-10-6-20-12-28z"/>
+    <path d="M192 230c0 10-2 18-6 24h28c-4-6-6-14-6-24z"/>
   </g>
-  <g fill="none" stroke="#6b5132" stroke-width="10" stroke-linecap="round">
-    <path d="M60 74c-36-6-44 46-6 54"/>
-    <path d="M340 74c36-6 44 46 6 54"/>
+
+  <g filter="url(#cr-wobble)">
+    <path d="${POT_BODY}" fill="url(#cr-iron)" stroke="#2a1f15" stroke-width="2"/>
+    <g clip-path="url(#cr-body)">
+      <rect x="30" y="50" width="340" height="190" filter="url(#cr-hammer)" opacity=".7"/>
+      <rect x="30" y="50" width="340" height="190" filter="url(#cr-pit)" opacity=".12"/>
+      <path d="M86 70c-26 40-24 96 6 130" fill="none" stroke="#a07a52" stroke-opacity=".14" stroke-width="16" stroke-linecap="round"/>
+      <rect x="30" y="50" width="340" height="190" fill="url(#cr-soot)"/>
+      <ellipse class="under" cx="200" cy="246" rx="150" ry="70" fill="url(#cr-under)"/>
+      <g fill="none" stroke-linecap="round">
+        <path d="M30 78Q200 116 370 78" stroke="#0b0704" stroke-width="13"/>
+        <path d="M30 72Q200 110 370 72" stroke="#5e4732" stroke-opacity=".5" stroke-width="1.5"/>
+        <path d="M30 186Q200 236 370 186" stroke="#0b0704" stroke-width="11"/>
+        <path d="M30 181Q200 231 370 181" stroke="#5e4732" stroke-opacity=".45" stroke-width="1.5"/>
+      </g>
+      <g fill="#3b2d20" stroke="#000" stroke-width=".8">
+        <circle cx="84.4" cy="88.2" r="3.2"/><circle cx="121.8" cy="93" r="3.2"/><circle cx="159.2" cy="95.9" r="3.2"/><circle cx="200" cy="97" r="3.2"/><circle cx="240.8" cy="95.9" r="3.2"/><circle cx="278.2" cy="93" r="3.2"/><circle cx="315.6" cy="88.2" r="3.2"/>
+        <circle cx="111.6" cy="204.2" r="3"/><circle cx="142.2" cy="208.1" r="3"/><circle cx="172.8" cy="210.4" r="3"/><circle cx="200" cy="211" r="3"/><circle cx="227.2" cy="210.4" r="3"/><circle cx="257.8" cy="208.1" r="3"/><circle cx="288.4" cy="204.2" r="3"/>
+      </g>
+      <g fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <g stroke="#000" stroke-opacity=".7" transform="translate(0 1.2)">${RUNES}</g>
+        <g class="emblem" stroke="#b8894a">${RUNES}</g>
+      </g>
+    </g>
+    <path d="M60 78c-6 4-8 10-6 16l12-4zM340 78c6 4 8 10 6 16l-12-4z" fill="#140d08" stroke="#3a2c1f"/>
+    <ellipse cx="200" cy="52" rx="152" ry="29" fill="url(#cr-lip)" stroke="#0b0704" stroke-width="2"/>
+    <ellipse class="lip-glow" cx="200" cy="50" rx="143" ry="23" fill="none" stroke="#e08a3c" stroke-width="3"/>
+    <ellipse cx="200" cy="50" rx="134" ry="19" fill="#070402"/>
+    <ellipse class="melt" cx="200" cy="54" rx="128" ry="14.5" fill="url(#cr-melt)"/>
+    <path d="M246 70c-1 6 1 12 4 14 2-3 1-9-1-14zM118 66c0 5 1 9 3 10 1-2 1-6-.5-10z" fill="#3d1a0b" opacity=".75"/>
   </g>
-  <path d="M52 48C38 122 70 198 138 224h124c68-26 100-102 86-176z" fill="url(#cr-iron)" stroke="#6b5132" stroke-width="2"/>
-  <path d="M52 48C38 122 70 198 138 224h124c68-26 100-102 86-176z" fill="url(#cr-shine)"/>
-  <path d="M50 116c64 22 236 22 300 0" fill="none" stroke="#c79a55" stroke-opacity=".55" stroke-width="4"/>
-  <path d="M52 124c64 22 232 22 296 0" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="2"/>
-  <g class="emblem" fill="none" stroke="#e0ad4f" stroke-width="2.2">
-    <circle cx="200" cy="178" r="21"/><path d="M200 161l15 26h-30z"/><path d="M186 178h28"/>
+
+  <g fill="none" stroke="#0b0704" stroke-width="7">
+    <circle cx="44" cy="106" r="17"/><circle cx="356" cy="106" r="17"/>
   </g>
-  <ellipse cx="200" cy="48" rx="156" ry="30" fill="url(#cr-rim)"/>
-  <ellipse cx="200" cy="46" rx="140" ry="21" fill="#0b0704"/>
-  <ellipse class="melt" cx="200" cy="51" rx="132" ry="16" fill="url(#cr-melt)"/>
+  <g fill="none" stroke="#5e4732" stroke-width="1.5" stroke-opacity=".6">
+    <path d="M31 96a17 17 0 0 0 4 24"/><path d="M369 96a17 17 0 0 1-4 24"/>
+  </g>
+
+  <g fill="url(#cr-stone)" stroke="#0e0b08" stroke-width="1.5" stroke-linejoin="round">
+    <path d="M72 254c4-8 22-10 36-7 8 2 10 10 8 17l-46 3c-3-4-2-9 2-13z"/>
+    <path d="M114 256c6-6 24-7 36-4 6 3 6 9 4 15h-42c-3-4-2-8 2-11z"/>
+    <path d="M246 254c8-5 26-6 38-2 6 3 6 10 3 15h-42c-3-5-3-9 1-13z"/>
+    <path d="M286 252c10-6 30-6 40 0 5 4 5 10 2 15l-44 1c-3-5-2-12 2-16z"/>
+  </g>
 </svg>`;
 
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI'];
