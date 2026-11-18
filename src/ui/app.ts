@@ -8,6 +8,25 @@ type SortMode = 'order' | 'name';
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+/** 觸控時輕震一下；iOS Safari 不支援 vibrate，會自動略過。 */
+const buzz = (pattern: number | number[]) => navigator.vibrate?.(pattern);
+
+/** 介面偏好（不屬於遊戲進度，不放進存檔碼）。 */
+const HIDE_EXHAUSTED_KEY = 'endless-crucible:hide-exhausted';
+function loadFlag(key: string): boolean {
+  try {
+    return localStorage.getItem(key) === '1';
+  } catch {
+    return false;
+  }
+}
+function saveFlag(key: string, on: boolean) {
+  try {
+    localStorage.setItem(key, on ? '1' : '0');
+  } catch {
+    /* 無法儲存時，只是下次開啟不會記得這個選擇 */
+  }
+}
 
 function $(root: ParentNode, sel: string): HTMLElement {
   const el = root.querySelector<HTMLElement>(sel);
@@ -191,6 +210,10 @@ export class App {
   private category = 'all';
   private query = '';
   private sort: SortMode = 'order';
+  private hideExhausted = loadFlag(HIDE_EXHAUSTED_KEY);
+  /** 還在飛往元素框途中的格子；重繪時先把內容藏起來，等元素落下才顯示。 */
+  private incoming = new Set<number>();
+  private lastPointer = '';
   private busy = false;
   private suppressClick = false;
   private renderQueued = false;
@@ -200,6 +223,7 @@ export class App {
     progressN: HTMLElement;
     progressTotal: HTMLElement;
     libCount: HTMLElement;
+    hideEx: HTMLButtonElement;
     progressFill: HTMLElement;
     hintCount: HTMLElement;
     crucible: HTMLElement;
@@ -237,6 +261,7 @@ export class App {
       progressN: $(r, '#progress-n'),
       progressTotal: $(r, '#progress-total'),
       libCount: $(r, '#lib-count'),
+      hideEx: $(r, '#btn-hide-ex') as HTMLButtonElement,
       progressFill: $(r, '#progress-fill'),
       hintCount: $(r, '#hint-count'),
       crucible: $(r, '#crucible'),
@@ -321,6 +346,7 @@ export class App {
       <div class="lib-head">
         <h2 id="lib-title">${t('list.title')}</h2>
         <span class="lib-count" id="lib-count"></span>
+        <button type="button" id="btn-hide-ex" class="toggle-chip"></button>
       </div>
       <div class="lib-tools">
         <input type="search" id="search" placeholder="${t('list.search')}" aria-label="${t('list.search')}" autocomplete="off" />
@@ -360,10 +386,16 @@ export class App {
       }
     });
 
+    el.grid.addEventListener('pointerdown', (e) => (this.lastPointer = e.pointerType));
     el.grid.addEventListener('click', (e) => {
       if (this.suppressClick) return;
       const btn = (e.target as Element).closest<HTMLElement>('.el');
-      if (btn?.dataset.id) this.addToSlot(btn.dataset.id);
+      if (btn?.dataset.id) this.addToSlot(btn.dataset.id, undefined, btn);
+    });
+    el.hideEx.addEventListener('click', () => {
+      this.hideExhausted = !this.hideExhausted;
+      saveFlag(HIDE_EXHAUSTED_KEY, this.hideExhausted);
+      this.renderLibrary();
     });
     this.bindDrag();
 
@@ -447,17 +479,75 @@ export class App {
 
   // ───────────────────────── 動作 ─────────────────────────
 
-  private addToSlot(id: ElementId, index?: number) {
+  /** from：從藥櫃點選時傳入被點的按鈕，用來播放飛入元素框的動畫。 */
+  private addToSlot(id: ElementId, index?: number, from?: HTMLElement) {
     if (this.busy) return;
+    const touch = !!from && this.lastPointer === 'touch';
     const i = index ?? this.slots.findIndex((s) => s === null);
     if (i < 0) {
+      if (touch) buzz([25, 50, 25]);
       this.showResult(`<span class="muted">${t('crucible.full')}</span>`, 'warn');
+      this.el.slots.classList.remove('shake');
+      void this.el.slots.offsetWidth;
+      this.el.slots.classList.add('shake');
       return;
     }
     this.slots[i] = id;
     this.sfx.tick();
+    if (touch) buzz(12);
     this.clearResult();
+    const fly = from ? this.prepareFly(from, id, i) : null;
     this.renderBench();
+    fly?.();
+  }
+
+  /**
+   * 讓被點的元素沿弧線飛進元素框，落下時元素框才亮起來。
+   * 回傳的函式要在 renderBench 之後呼叫，那時才量得到元素框的位置。
+   */
+  private prepareFly(from: HTMLElement, id: ElementId, i: number): (() => void) | null {
+    from.classList.remove('picked');
+    void from.offsetWidth;
+    from.classList.add('picked');
+    if (reducedMotion()) return null;
+    const src = (from.querySelector('.emoji') ?? from).getBoundingClientRect();
+    this.incoming.add(i);
+    return () => {
+      const slot = this.el.slots.querySelector<HTMLElement>(`.slot[data-index="${i}"]`);
+      if (!slot) {
+        this.incoming.delete(i);
+        return;
+      }
+      const dst = slot.getBoundingClientRect();
+      const ax = src.left + src.width / 2;
+      const ay = src.top + src.height / 2;
+      const bx = dst.left + dst.width / 2;
+      const by = dst.top + dst.height / 2;
+      const ghost = document.createElement('span');
+      ghost.className = 'fly';
+      ghost.setAttribute('aria-hidden', 'true');
+      ghost.textContent = this.game.content.elements.get(id)!.emoji;
+      document.body.append(ghost);
+      const at = (x: number, y: number, k: number) => `translate(${x}px, ${y}px) translate(-50%, -50%) scale(${k})`;
+      const lift = Math.min(90, Math.abs(ay - by) * 0.25);
+      const anim = ghost.animate(
+        [
+          { transform: at(ax, ay, 1) },
+          { transform: at((ax + bx) / 2, Math.min(ay, by) - lift, 1.35), offset: 0.55 },
+          { transform: at(bx, by, 1.5), opacity: 0.85 },
+        ],
+        { duration: 380, easing: 'cubic-bezier(.45,0,.25,1)' },
+      );
+      const land = () => {
+        ghost.remove();
+        if (!this.incoming.delete(i)) return;
+        this.el.slots.querySelector(`.slot[data-index="${i}"]`)?.classList.remove('incoming');
+      };
+      anim.onfinish = land;
+      anim.oncancel = land;
+      // 分頁切到背景時動畫會暫停；保險起見，時間到就直接落下，元素框不會一直空著
+      setTimeout(land, 900);
+    };
   }
 
   /** 元素框內容一變動，就清掉上一次的鍊成結果，避免和新的組合混淆。 */
@@ -576,7 +666,8 @@ export class App {
           return `${plus}<button type="button" class="slot empty" data-index="${i}" aria-label="${t('crucible.slot.label', { n })}"><span class="slot-n" aria-hidden="true">${ROMAN[i] ?? n}</span></button>`;
         }
         const e = content.elements.get(id)!;
-        return `${plus}<button type="button" class="slot filled" data-index="${i}" aria-label="${esc(t('crucible.slot.filled', { n, name: e.name }))}">
+        const inc = this.incoming.has(i) ? ' incoming' : '';
+        return `${plus}<button type="button" class="slot filled${inc}" data-index="${i}" aria-label="${esc(t('crucible.slot.filled', { n, name: e.name }))}">
           <span class="emoji">${e.emoji}</span><span class="name">${esc(e.name)}</span></button>`;
       })
       .join('');
@@ -607,16 +698,27 @@ export class App {
   private renderLibrary() {
     this.el.sort.textContent = this.sort === 'order' ? t('list.sort.order') : t('list.sort.name');
     const q = this.query.toLowerCase();
+    const hint = this.game.currentHint();
+    const hinted = new Set(hint?.revealed.map((e) => e.id));
+
     let list = this.game.discoveredElements();
     if (this.category !== 'all') list = list.filter((e) => e.category === this.category);
     if (q) list = list.filter((e) => e.name.toLowerCase().includes(q) || e.id.includes(q));
     if (this.sort === 'name') list = [...list].sort((a, b) => a.name.localeCompare(b.name, 'zh-Hant-TW'));
 
-    const hint = this.game.currentHint();
-    const hinted = new Set(hint?.revealed.map((e) => e.id));
+    // 已用盡的元素沉到最後（穩定排序，其餘順序不變）；提示中的元素一律留在前面
+    const spent = (id: ElementId) => this.game.isExhausted(id) && !hinted.has(id);
+    const spentCount = list.filter((e) => spent(e.id)).length;
+    list = [...list].sort((a, b) => Number(spent(a.id)) - Number(spent(b.id)));
+    if (this.hideExhausted) list = list.filter((e) => !spent(e.id));
+
+    this.el.hideEx.setAttribute('aria-pressed', String(this.hideExhausted));
+    this.el.hideEx.textContent = t('list.hideExhausted', { n: spentCount });
+    this.el.hideEx.hidden = spentCount === 0 && !this.hideExhausted;
 
     if (list.length === 0) {
-      this.el.grid.innerHTML = `<p class="empty">${t('list.empty')}</p>`;
+      const allSpent = this.hideExhausted && spentCount > 0;
+      this.el.grid.innerHTML = `<p class="empty">${allSpent ? t('list.allExhausted') : t('list.empty')}</p>`;
       return;
     }
     this.el.grid.innerHTML = list

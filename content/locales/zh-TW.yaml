@@ -30,6 +30,8 @@ list.sort.order: 依發現順序
 list.sort.name: 依名稱
 list.empty: 沒有符合的元素
 list.exhausted: 已用盡
+list.hideExhausted: 隱藏已用盡（{n}）
+list.allExhausted: 這裡的元素都用盡了，關掉「隱藏已用盡」就能看到
 list.add: 放入 {name}
 
 discover.title: 新發現！
