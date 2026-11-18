@@ -53,11 +53,11 @@ export class SaveError extends Error {}
 
 /** 把任意來源的存檔資料遷移到最新版，並與目前內容對齊。 */
 export function normalizeSave(raw: unknown, content: Content): SaveData {
-  if (!raw || typeof raw !== 'object') throw new SaveError('存檔格式錯誤');
+  if (!raw || typeof raw !== 'object') throw new SaveError('存檔碼格式不對');
   let data = raw as Record<string, unknown>;
   let version = typeof data.version === 'number' ? data.version : NaN;
-  if (!Number.isInteger(version) || version < 1) throw new SaveError('存檔缺少版本號');
-  if (version > SAVE_VERSION) throw new SaveError('存檔來自較新版本的遊戲');
+  if (!Number.isInteger(version) || version < 1) throw new SaveError('這串存檔碼不完整');
+  if (version > SAVE_VERSION) throw new SaveError('這串存檔碼來自比較新的版本，請先更新遊戲');
   while (version < SAVE_VERSION) {
     const migrate = MIGRATIONS[version];
     if (!migrate) throw new SaveError(`缺少 v${version} 的遷移程式`);
@@ -122,7 +122,7 @@ export function decodeSaveCode(code: string, content: Content): SaveData {
   try {
     parsed = JSON.parse(fromBase64(trimmed.slice(CODE_PREFIX.length)));
   } catch {
-    throw new SaveError('存檔碼已損毀');
+    throw new SaveError('存檔碼不完整或有錯字，請重新複製一次');
   }
   return normalizeSave(parsed, content);
 }

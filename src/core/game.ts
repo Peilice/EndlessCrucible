@@ -74,6 +74,16 @@ export class Game {
     return this.failedSet.has(recipeKey(inputs));
   }
 
+  /**
+   * 這個組合在配方表裡、而且產物已經擁有時，回傳產物；否則回傳 null。
+   * 進度只看擁有哪些元素，所以提前說出已擁有的產物不會洩漏新東西（與 isExhausted 同一套判斷）。
+   */
+  knownOutput(inputs: readonly ElementId[]): ElementDef | null {
+    if (!this.canCraft(inputs)) return null;
+    const out = this.content.recipesByKey.get(recipeKey(inputs))?.output;
+    return out && this.discoveredSet.has(out) ? (this.content.elements.get(out) ?? null) : null;
+  }
+
   /** 所有用到此元素的配方，產物都已發現。 */
   isExhausted(id: ElementId): boolean {
     const uses = this.content.recipesByInput.get(id) ?? [];

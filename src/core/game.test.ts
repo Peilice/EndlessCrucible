@@ -22,6 +22,15 @@ describe('鍊成', () => {
     expect(g.data.stats.attempts).toBe(4);
   });
 
+  it('已合成過的組合可事先得知產物', async () => {
+    const g = setup();
+    expect(g.knownOutput(['a', 'b'])).toBeNull();
+    await g.craft(['a', 'b']);
+    expect(g.knownOutput(['b', 'a'])?.id).toBe('c');
+    expect(g.knownOutput(['a', 'a'])).toBeNull();
+    expect(g.knownOutput(['a'])).toBeNull();
+  });
+
   it('三材料配方', async () => {
     const g = setup();
     await g.craft(['a', 'b']);

@@ -27,7 +27,7 @@ export default defineConfig({
       manifest: {
         name: '無垠鍊成 Endless Crucible',
         short_name: '無垠鍊成',
-        description: '從水、火、土、風開始，不停合成、發現新元素的煉金遊戲。',
+        description: '從水、火、土、風開始，一樣一樣鍊出新元素的煉金遊戲。',
         lang: 'zh-TW',
         theme_color: '#14100c',
         background_color: '#14100c',

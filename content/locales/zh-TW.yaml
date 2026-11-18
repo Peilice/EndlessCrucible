@@ -12,15 +12,15 @@ header.settings: 設定
 crucible.title: 鍊成台
 crucible.slot.empty: 空
 crucible.slot.label: 第 {n} 格
-crucible.slot.filled: 第 {n} 格：{name}，點擊取出
+crucible.slot.filled: 第 {n} 格：{name}，點一下取出
 crucible.craft: 鍊成
 crucible.clear: 清空
-crucible.tried: 已試過
-crucible.help: 點選元素清單中的元素放入元素框，放入 2～3 個後按「鍊成」
-crucible.fail: 無反應……
-crucible.failRepeat: 還是無反應
-crucible.known: 合成出 {name}
-crucible.full: 元素框已滿
+crucible.tried: 試過了，沒反應
+crucible.help: 從藥櫃點 2～3 樣放進坩堝，再按「鍊成」
+crucible.fail: 沒有反應
+crucible.failRepeat: 還是沒有反應
+crucible.known: 鍊成了{name}
+crucible.full: 三格都滿了，先取出一樣
 
 list.title: 藥櫃
 list.count: "{n} 種元素"
@@ -28,34 +28,34 @@ list.search: 搜尋元素
 list.all: 全部
 list.sort.order: 依發現順序
 list.sort.name: 依名稱
-list.empty: 沒有符合的元素
-list.exhausted: 已用盡
-list.hideExhausted: 隱藏已用盡（{n}）
-list.allExhausted: 這裡的元素都用盡了，關掉「隱藏已用盡」就能看到
+list.empty: 找不到符合的元素
+list.exhausted: 已用完
+list.hideExhausted: 隱藏已用完（{n}）
+list.allExhausted: 這一類都用完了，關掉「隱藏已用完」就看得到
 list.add: 放入 {name}
 
-discover.title: 新發現！
-discover.ok: 太好了
-discover.achievement: 解鎖成就：{name}
-discover.hints: 獲得 {n} 次提示
+discover.title: 新元素
+discover.ok: 繼續
+discover.achievement: 達成成就：{name}
+discover.hints: 提示 +{n}
 
 hint.title: 提示
 hint.remaining: 剩餘提示：{n} 次
-hint.progress: 再發現 {n} 個新元素可獲得 1 次提示
-hint.use: 使用 1 次提示
-hint.none: 提示次數不足
-hint.noCandidates: 目前沒有可以提示的配方
-hint.level1: 「{a}」還藏著一個未知的反應……
+hint.progress: 再發現 {n} 種新元素，就多 1 次提示
+hint.use: 用 1 次提示
+hint.none: 提示用完了
+hint.noCandidates: 現在沒有能提示的配方
+hint.level1: 「{a}」還有沒試出來的組合
 hint.levelInputs: 試試看：{list} + ？
-hint.levelFull: 完整配方：{list}
+hint.levelFull: 配方：{list}
 hint.output: 產物：{name}
-hint.more: 揭露更多
+hint.more: 再多給一點
 hint.close: 關閉
 
 achievements.title: 成就
-achievements.count: 已解鎖 {n} / {total}
-achievements.locked: 尚未解鎖
-achievements.reward: 獎勵 {n} 次提示
+achievements.count: 已達成 {n} / {total}
+achievements.locked: 還沒達成
+achievements.reward: 提示 +{n}
 achievements.close: 關閉
 
 settings.title: 設定
@@ -66,16 +66,16 @@ settings.stats: 統計
 settings.attempts: 鍊成次數：{n}
 settings.playtime: 遊玩時間：{t}
 settings.export: 匯出存檔碼
-settings.exportHelp: 複製下方存檔碼，在其他裝置的「匯入」貼上即可搬移進度。
+settings.exportHelp: 複製這串存檔碼，到另一台裝置的「匯入存檔碼」貼上，就能接著玩。
 settings.copy: 複製
 settings.copied: 已複製
 settings.import: 匯入存檔碼
 settings.importPlaceholder: 貼上存檔碼
 settings.importConfirm: 匯入（會覆蓋目前進度）
-settings.imported: 匯入成功
+settings.imported: 匯入完成
 settings.reset: 重置進度
-settings.resetConfirm: 確定要清除所有進度嗎？此動作無法復原。
-settings.resetYes: 確定重置
+settings.resetConfirm: 確定要清除所有進度？清掉就找不回來了。
+settings.resetYes: 清除進度
 settings.resetNo: 取消
 settings.close: 關閉
 settings.version: 版本 {v}

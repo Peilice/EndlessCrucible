@@ -337,7 +337,7 @@ export class App {
         <button type="button" id="btn-clear" class="ghost-btn">${t('crucible.clear')}</button>
         <button type="button" id="btn-craft" class="primary-btn">${t('crucible.craft')}</button>
       </div>
-      <p class="tried" id="tried" hidden>${icon('retry')}${t('crucible.tried')}</p>
+      <p class="tried" id="tried" hidden></p>
       <p class="help" id="help">${t('crucible.help')}</p>
       <button type="button" class="hint-banner" id="hint-banner" hidden></button>
     </section>
@@ -677,7 +677,16 @@ export class App {
     this.el.crucible.dataset.fill = String(inputs.length);
     this.el.craft.disabled = !can || this.busy;
     this.el.clear.disabled = inputs.length === 0;
-    this.el.tried.hidden = !(can && this.game.wasFailed(inputs));
+    // 放好的組合以前做過：失敗過就說「已試過」，成功過就直接說會得到什麼
+    const known = can ? this.game.knownOutput(inputs) : null;
+    const failed = can && !known && this.game.wasFailed(inputs);
+    this.el.tried.hidden = !known && !failed;
+    this.el.tried.classList.toggle('is-known', !!known);
+    if (known) {
+      this.el.tried.innerHTML = `<span class="tried-el"><span aria-hidden="true">${known.emoji}</span>${esc(known.name)}</span>`;
+    } else if (failed) {
+      this.el.tried.innerHTML = `${icon('retry')}${t('crucible.tried')}`;
+    }
     this.el.help.hidden = this.game.data.stats.attempts > 0;
 
     const hint = this.game.currentHint();
