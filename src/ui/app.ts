@@ -1,3 +1,4 @@
+import { recipeKey } from '../core/content';
 import { Game, type CraftResult, type HintView } from '../core/game';
 import { SaveError, decodeSaveCode, encodeSaveCode } from '../core/save';
 import type { ElementDef, ElementId } from '../core/types';
@@ -207,6 +208,8 @@ function setupDialog(dialog: HTMLDialogElement) {
 
 export class App {
   private slots: (ElementId | null)[];
+  /** 剛鍊成失敗、還留在框裡的組合；結果訊息已經說了沒反應，就不再重複顯示「已試過」。 */
+  private justFailed: string | null = null;
   private category = 'all';
   private query = '';
   private sort: SortMode = 'order';
@@ -584,6 +587,7 @@ export class App {
       case 'fail': {
         this.sfx.fail();
         const msg = r.repeated ? t('crucible.failRepeat') : t('crucible.fail');
+        this.justFailed = recipeKey(this.filled());
         this.showResult(`<span class="muted">${msg}</span>`, 'fail');
         this.announce(msg);
         break;
@@ -678,8 +682,10 @@ export class App {
     this.el.craft.disabled = !can || this.busy;
     this.el.clear.disabled = inputs.length === 0;
     // 放好的組合以前做過：失敗過就說「已試過」，成功過就直接說會得到什麼
+    const key = recipeKey(inputs);
+    if (key !== this.justFailed) this.justFailed = null; // 換了組合，之後再放回來就照常顯示
     const known = can ? this.game.knownOutput(inputs) : null;
-    const failed = can && !known && this.game.wasFailed(inputs);
+    const failed = can && !known && key !== this.justFailed && this.game.wasFailed(inputs);
     this.el.tried.hidden = !known && !failed;
     this.el.tried.classList.toggle('is-known', !!known);
     if (known) {
