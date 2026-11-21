@@ -64,6 +64,28 @@ describe('鍊成', () => {
   });
 });
 
+describe('典籍', () => {
+  it('只列材料都已擁有的配方，並計算還沒發現的反應', async () => {
+    const g = setup();
+    expect(g.knownRecipesFor('c').map((r) => r.key)).toEqual(['a+b']);
+    expect(g.knownRecipesFor('d')).toEqual([]); // 還沒有 c
+    expect(g.unknownUseCount('a')).toBe(2); // a+b=c、a+b+c=e
+    await g.craft(['a', 'b']);
+    expect(g.unknownUseCount('a')).toBe(1);
+    expect(g.knownRecipesFor('d').map((r) => r.key)).toEqual(['c+c']);
+  });
+
+  it('發現順序不算起始元素', async () => {
+    const g = setup();
+    expect(g.discoveryIndex('a')).toBe(0);
+    expect(g.discoveryIndex('c')).toBe(0);
+    await g.craft(['a', 'b']);
+    await g.craft(['c', 'c']);
+    expect(g.discoveryIndex('c')).toBe(1);
+    expect(g.discoveryIndex('d')).toBe(2);
+  });
+});
+
 describe('提示與成就', () => {
   it('每發現 N 個新元素獲得提示，成就也會給提示', async () => {
     const g = setup(); // initial 1、perDiscoveries 2

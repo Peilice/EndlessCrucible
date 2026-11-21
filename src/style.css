@@ -12,12 +12,16 @@
   --gold: #e0ad4f;
   --gold-2: #f6cf7a;
   --gold-ink: #24180a;
+  /* 霧金：不發光的文字與器物用色；真正發光的只留給「正在發生的事」（熔液、鍊成中的法陣） */
+  --brass: #c9a465;
+  --brass-dim: #8a6a3e;
   --ember: #e4642c;
   --danger: #d9534f;
   --ok: #8cc084;
   --radius: 14px;
   --target: 32px;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-calm: cubic-bezier(0.45, 0, 0.25, 1);
   --shadow-lift: 0 6px 16px -8px #000c;
   --font-serif: 'Noto Serif TC', 'Source Han Serif TC', 'Songti TC', 'PMingLiU', serif;
   --font-latin: 'Cormorant Garamond', 'Garamond', 'Times New Roman', serif;
@@ -87,18 +91,26 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
   border: 1px solid var(--line-2);
   transition: background-color 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.2s, transform 0.12s var(--ease-out);
 }
+/* 主按鈕：磨舊的黃銅牌，字像刻上去的 */
 .primary-btn {
-  background: linear-gradient(180deg, #ffe2a0 0%, var(--gold-2) 18%, var(--gold) 100%);
-  border-color: #b9842f;
-  color: var(--gold-ink);
+  border-radius: 10px;
+  background: var(--noise), linear-gradient(180deg, #3d2c1b, #241910);
+  border-color: #7a5c36;
+  color: #e2c58e;
   font-family: var(--font-serif);
   font-weight: 700;
   letter-spacing: 0.2em;
   text-indent: 0.2em;
-  box-shadow: inset 0 1px 0 #fff6, inset 0 -2px 0 #0002, 0 8px 22px -8px #e0ad4f99;
+  text-shadow: 0 -1px 0 #000a;
+  box-shadow: inset 0 1px 0 #f6cf7a26, inset 0 -2px 0 #0007, 0 2px 0 #0009;
+  transition: border-color 0.3s, color 0.3s, box-shadow 0.4s, transform 0.12s var(--ease-out);
 }
-.primary-btn:not(:disabled):hover { filter: brightness(1.07); box-shadow: inset 0 1px 0 #fff6, inset 0 -2px 0 #0002, 0 10px 28px -8px #f6cf7acc; }
-.primary-btn:disabled { filter: saturate(0.55); box-shadow: inset 0 1px 0 #fff3; }
+.primary-btn:not(:disabled):hover {
+  border-color: var(--brass);
+  color: #f0d9a8;
+  box-shadow: inset 0 1px 0 #f6cf7a33, inset 0 -2px 0 #0007, 0 2px 0 #0009, 0 0 22px -8px #e0ad4f66;
+}
+.primary-btn:disabled { opacity: 0.5; }
 .primary-btn:not(:disabled):active, .ghost-btn:not(:disabled):active, .danger-btn:active { transform: scale(0.97); }
 .ghost-btn { background: var(--panel-2); }
 .ghost-btn:not(:disabled):hover { border-color: var(--gold); color: var(--gold-2); }
@@ -159,8 +171,8 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
   font-size: 2.1rem;
   line-height: 1.05;
   letter-spacing: 0.2em;
-  color: var(--gold-2);
-  text-shadow: 0 2px 0 #6b4a1c, 0 0 30px #e0ad4f55;
+  color: var(--brass);
+  text-shadow: 0 2px 0 #0009;
 }
 .subtitle {
   font-family: var(--font-latin);
@@ -171,33 +183,8 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
   color: var(--muted);
 }
 .tally { display: grid; justify-items: end; gap: 0.35rem; }
-.count { margin: 0; }
-.count-vis { display: grid; justify-items: end; font-variant-numeric: tabular-nums; }
-.count-vis b {
-  font-family: var(--font-serif);
-  font-weight: 900;
-  font-size: 2.8rem;
-  line-height: 1;
-  color: var(--gold-2);
-  text-shadow: 0 2px 0 #6b4a1c, 0 0 24px #e0ad4f44;
-}
-.count-vis span { color: var(--muted); font-size: 0.82rem; letter-spacing: 0.2em; }
-.bar {
-  inline-size: 9rem;
-  block-size: 4px;
-  border-radius: 99px;
-  background: #0008;
-  box-shadow: 0 1px 0 #ffffff0a;
-  overflow: hidden;
-}
-#progress-fill {
-  min-inline-size: 4px;
-  block-size: 100%;
-  background: linear-gradient(90deg, #a8401a, var(--ember) 40%, var(--gold-2));
-  border-radius: inherit;
-  box-shadow: 0 0 8px #f6cf7a88;
-  transition: inline-size 0.8s var(--ease-out);
-}
+.count { margin: 0; color: var(--muted); font-size: 0.85rem; letter-spacing: 0.08em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.count b { font-family: var(--font-serif); font-weight: 700; font-size: 1.1rem; color: var(--text); margin-inline: 0.15em; }
 .actions { display: flex; gap: 0.45rem; margin-block-start: 0.35rem; }
 .icon-btn {
   position: relative;
@@ -208,7 +195,7 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
   border-radius: 50%;
   border: 1px solid var(--line-2);
   background: #0007;
-  color: var(--gold);
+  color: var(--brass);
   transition: border-color 0.15s, color 0.15s, background-color 0.15s, transform 0.12s var(--ease-out);
 }
 .icon-btn .icon { inline-size: 1.3rem; block-size: 1.3rem; }
@@ -219,8 +206,9 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
   min-inline-size: 1.5em;
   padding: 0.05em 0.4em;
   border-radius: 99px;
-  background: linear-gradient(180deg, var(--gold-2), var(--gold));
-  color: var(--gold-ink);
+  border: 1px solid #6b5132;
+  background: #3a2b1b;
+  color: var(--brass);
   font-size: 0.72rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -268,23 +256,19 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
   fill: none;
   stroke: var(--gold);
   stroke-width: 0.6;
-  opacity: 0.26;
+  opacity: 0.22;
   pointer-events: none;
-  transition: opacity 0.6s var(--ease-out), filter 0.6s var(--ease-out);
+  transition: opacity 1.2s var(--ease-calm), filter 1.2s var(--ease-calm), stroke 1.2s var(--ease-calm);
 }
 .sigil .spin { transform-origin: 100px 100px; animation: spin 160s linear infinite; }
 .sigil .ticks { stroke-width: 3; stroke-dasharray: 0.5 4.32; opacity: 0.8; }
 .sigil .faint { opacity: 0.55; }
 .sigil .glyphs { stroke-width: 1.1; }
-.crucible[data-fill='1'] .sigil { opacity: 0.32; }
+.crucible[data-fill='1'] .sigil { opacity: 0.26; }
 .crucible[data-fill='2'] .sigil,
-.crucible[data-fill='3'] .sigil { opacity: 0.42; filter: drop-shadow(0 0 4px #e0ad4f66); }
-.crucible.brewing .sigil {
-  opacity: 0.85;
-  stroke: var(--gold-2);
-  filter: drop-shadow(0 0 7px #f6cf7a);
-  transition-duration: 0.3s;
-}
+.crucible[data-fill='3'] .sigil { opacity: 0.32; }
+.crucible.brewing .sigil { opacity: 0.55; filter: drop-shadow(0 0 4px #e0ad4f88); }
+.crucible.dim .sigil { opacity: 0.16; }
 
 .slots {
   display: flex;
@@ -319,27 +303,51 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
 }
 .slot.empty:hover .slot-n, .slot.drop-over .slot-n { color: var(--gold); }
 .slot.filled {
-  border: 2px solid var(--gold);
-  background: radial-gradient(circle at 50% 30%, #3e2c18, #120c07 72%);
-  box-shadow: 0 0 40px -8px #e0ad4fbb, inset 0 0 22px #000c, inset 0 2px 0 #f6cf7a44;
+  position: relative;
+  border: 1.5px solid var(--brass-dim);
+  background: radial-gradient(circle at 50% 30%, #35271a, #120c07 72%);
+  box-shadow: 0 0 22px -10px #e0ad4f66, inset 0 0 22px #000c, inset 0 2px 0 #f6cf7a1f;
   animation: drop-in 0.32s var(--ease-out);
 }
-.slot.filled:hover { border-color: var(--danger); box-shadow: 0 0 30px -8px #d9534f99, inset 0 0 22px #000c; }
+/* 取出提示：變暗並出現 ×，不用警告色 */
+.slot.filled::after {
+  content: '×';
+  position: absolute;
+  inset-block-start: -2px;
+  inset-inline-end: -2px;
+  display: grid;
+  place-items: center;
+  inline-size: 22px;
+  block-size: 22px;
+  border-radius: 50%;
+  border: 1px solid #6b5132;
+  background: #2a1f15;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.slot.filled > * { transition: opacity 0.2s; }
+.slot.filled:hover { border-color: #6b5132; }
+.slot.filled:hover > * { opacity: 0.55; }
+.slot.filled:hover::after { opacity: 1; }
 .slot.empty:hover, .slot.drop-over { border-color: var(--gold-2); transform: scale(1.04); }
 .slot .emoji { font-size: calc(var(--slot) * 0.36); line-height: 1.1; filter: drop-shadow(0 4px 6px #000); }
-.slot .name { font-family: var(--font-serif); font-weight: 700; color: var(--gold-2); font-size: clamp(0.75rem, calc(var(--slot) * 0.13), 1rem); max-inline-size: 6.5em; text-align: center; line-height: 1.2; }
+.slot .name { font-family: var(--font-serif); font-weight: 700; color: #e8d3a6; font-size: clamp(0.75rem, calc(var(--slot) * 0.13), 1rem); max-inline-size: 6.5em; text-align: center; line-height: 1.2; }
 
 /* 坩堝本體（SVG） */
 .pot-wrap { position: relative; inline-size: var(--pot-w); }
 .pot { display: block; inline-size: 100%; block-size: auto; overflow: visible; filter: drop-shadow(0 24px 30px #000c); }
-.pot .melt { opacity: 0.45; transition: opacity 0.5s var(--ease-out); }
-.pot .heat { opacity: 0.55; transition: opacity 0.5s var(--ease-out); }
-.pot .flames path { transform-box: fill-box; transform-origin: 50% 100%; animation: flicker 1.6s ease-in-out infinite alternate; }
-.pot .flames path:nth-child(2) { animation-duration: 1.2s; animation-delay: -0.4s; }
-.pot .flames path:nth-child(3) { animation-duration: 1.9s; animation-delay: -0.9s; }
-.pot .emblem { opacity: 0.35; transition: opacity 0.5s, filter 0.5s, stroke 0.5s; }
-.pot .lip-glow { stroke-opacity: 0.25; transition: stroke-opacity 0.5s var(--ease-out); }
-.pot .under { opacity: 0.6; transition: opacity 0.5s var(--ease-out); }
+.pot .melt { opacity: 0.45; transition: opacity 1.1s var(--ease-calm); }
+.pot .heat { opacity: 0.55; transition: opacity 1.1s var(--ease-calm); }
+/* 火焰慢慢燒；鍊成時也只稍微旺一點，不閃爍 */
+.pot .flames path { transform-box: fill-box; transform-origin: 50% 100%; animation: flicker 2.6s ease-in-out infinite alternate; }
+.pot .flames path:nth-child(2n) { animation-duration: 2.1s; animation-delay: -0.7s; }
+.pot .flames path:nth-child(3n) { animation-duration: 3.1s; animation-delay: -1.4s; }
+.pot .emblem { opacity: 0.35; transition: opacity 1.1s var(--ease-calm), filter 1.1s var(--ease-calm), stroke 1.1s var(--ease-calm); }
+.pot .lip-glow { stroke-opacity: 0.25; transition: stroke-opacity 1.1s var(--ease-calm); }
+.pot .under { opacity: 0.6; transition: opacity 1.1s var(--ease-calm); }
 .crucible[data-fill='1'] .pot .melt { opacity: 0.65; }
 .crucible[data-fill='2'] .pot .melt,
 .crucible[data-fill='3'] .pot .melt { opacity: 0.95; }
@@ -349,12 +357,14 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
 .crucible[data-fill='3'] .pot .lip-glow { stroke-opacity: 0.5; }
 .crucible[data-fill='2'] .pot .under,
 .crucible[data-fill='3'] .pot .under { opacity: 0.9; }
-.crucible.brewing .pot .melt { opacity: 1; animation: glow-pulse 0.42s ease-in-out infinite alternate; }
+.crucible.brewing .pot .melt { opacity: 1; }
 .crucible.brewing .pot .heat { opacity: 1; }
-.crucible.brewing .pot .flames path { animation-duration: 0.25s; }
-.crucible.brewing .pot .emblem { opacity: 1; stroke: #f6cf7a; filter: drop-shadow(0 0 3px #ff9a3c); }
-.crucible.brewing .pot .lip-glow { stroke-opacity: 0.8; }
+.crucible.brewing .pot .flames path { animation-duration: 1.6s; }
+.crucible.brewing .pot .emblem { opacity: 0.85; stroke: #e8c27a; filter: drop-shadow(0 0 2px #ff9a3c99); }
+.crucible.brewing .pot .lip-glow { stroke-opacity: 0.65; }
 .crucible.brewing .pot .under { opacity: 1; }
+/* 失敗：熔液暗下去再慢慢回來 */
+.crucible.dim .pot .melt { animation: dim 1.8s var(--ease-calm); }
 
 .bubbles { position: absolute; inset: 4% 22% auto; block-size: 14%; pointer-events: none; }
 .bubbles i {
@@ -371,37 +381,88 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
 .bubbles i:nth-child(3) { inset-inline-start: 50%; animation-delay: 0.05s; }
 .bubbles i:nth-child(4) { inset-inline-start: 70%; animation-delay: 0.2s; inline-size: 5px; }
 .bubbles i:nth-child(5) { inset-inline-start: 90%; animation-delay: 0.1s; }
-.crucible.brewing .bubbles i { animation-name: bubble; animation-duration: 0.5s; animation-iteration-count: infinite; }
-.crucible.brewing .slot.filled { animation: pull-in 0.42s ease-in forwards; }
-.crucible.shake { animation: shake 0.4s; }
+.crucible.brewing .bubbles i { animation: bubble 1.5s var(--ease-calm) infinite; }
+.crucible.brewing .bubbles i:nth-child(2n) { animation-delay: 0.5s; }
+.crucible.brewing .bubbles i:nth-child(3n) { animation-delay: 0.9s; }
+.crucible.brewing .slot.filled { animation: sink 1.1s var(--ease-calm) forwards; }
+
+/* 失敗時鍋口冒出的一縷煙、新發現時鍋面泛起的漣漪 */
+.smoke {
+  position: absolute;
+  inset-block-start: 2%;
+  inset-inline-start: 50%;
+  inline-size: 34%;
+  block-size: 22%;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #8b7d6b55, transparent);
+  filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+}
+.crucible.dim .smoke { animation: smoke 2s var(--ease-calm); }
+.ripple {
+  position: absolute;
+  inset-block-start: 9%;
+  inset-inline-start: 50%;
+  inline-size: 60%;
+  block-size: 12%;
+  translate: -50% 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold-2);
+  opacity: 0;
+  pointer-events: none;
+}
+.crucible.bloom .ripple { animation: ripple 1.6s var(--ease-calm); }
 
 .result {
   min-block-size: 2.4rem;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   margin-block-start: 0.4rem;
   font-size: 1.15rem;
+  text-align: center;
 }
 .result .emoji { font-size: 1.8rem; filter: drop-shadow(0 3px 6px #000a); }
 .result .name { font-family: var(--font-serif); font-weight: 700; font-size: 1.45rem; }
-.result.is-new .name { color: var(--gold-2); text-shadow: 0 0 20px #e0ad4f77; }
-.result.is-new, .result.is-known { animation: rise 0.5s var(--ease-out); }
-.result.is-fail, .result.is-warn { animation: fade-in 0.3s; }
+.result.is-new .name { color: #f0dcae; }
+.result.is-new, .result.is-known { animation: soft-in 0.7s var(--ease-calm); }
+.result.is-fail { font-family: var(--font-serif); animation: soft-in 0.8s var(--ease-calm); }
+.result.is-warn { animation: soft-in 0.4s var(--ease-calm); }
+/* 結果可以點開典籍；外觀維持純文字，不像按鈕 */
+.result-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.1rem 0.6rem;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: inherit;
+  transition: background-color 0.2s;
+}
+.result-btn:hover { background: #ffffff0a; }
+.result-btn.reveal { display: grid; justify-items: center; gap: 0.15rem; padding: 0.2rem 0.8rem; max-inline-size: 30rem; }
+.reveal-top { display: inline-flex; align-items: center; gap: 0.5rem; }
+.reveal .emoji { animation: float-up 1.2s var(--ease-calm); filter: drop-shadow(0 0 14px #f6cf7a55); }
+.reveal .name { color: #f0dcae; }
+.reveal-tag { font-size: 0.7rem; letter-spacing: 0.25em; text-indent: 0.25em; color: var(--brass); border: 1px solid #6b5132; border-radius: 4px; padding: 0 0.35rem; }
+.reveal-desc { font-family: var(--font-serif); font-size: 0.95rem; color: #d9cbad; animation: soft-in 1.4s var(--ease-calm); }
+.reveal-gain { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.82rem; color: var(--brass); animation: soft-in 1.6s var(--ease-calm); }
 
 .bench-actions { display: flex; gap: 0.8rem; align-items: center; }
 .bench-actions .ghost-btn { background: #0007; color: var(--muted); padding-inline: 1.3rem; }
 .bench-actions .primary-btn {
-  min-inline-size: min(15rem, 60vw);
-  padding-block: clamp(0.5rem, 1.6cqb, 0.85rem);
-  font-size: 1.6rem;
-  font-weight: 900;
-  letter-spacing: 0.5em;
-  text-indent: 0.5em;
-  box-shadow: inset 0 1px 0 #fff8, inset 0 -3px 0 #0003, 0 14px 40px -10px #f6cf7acc;
+  min-inline-size: min(13rem, 56vw);
+  padding-block: clamp(0.45rem, 1.4cqb, 0.7rem);
+  font-size: 1.35rem;
+  letter-spacing: 0.4em;
+  text-indent: 0.4em;
 }
-.tried { display: inline-flex; align-items: center; gap: 0.35rem; margin: 0; color: #e7a46b; font-size: 0.9rem; }
-.tried.is-known { color: var(--gold-2); }
+.tried { display: inline-flex; align-items: center; gap: 0.35rem; margin: 0; color: var(--muted); font-size: 0.9rem; }
+.tried.is-known { color: var(--brass); }
 .tried-el { display: inline-flex; align-items: center; gap: 0.25rem; font-family: var(--font-serif); font-weight: 700; font-size: 1rem; }
 .help { margin: 0; max-inline-size: 30rem; color: var(--muted); font-size: 0.9rem; text-align: center; }
 .hint-banner {
@@ -440,7 +501,7 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
 }
 .lib-head { display: flex; align-items: center; gap: 0.6rem 1rem; flex-wrap: wrap; }
 .lib-head .lib-count { margin-inline-end: auto; }
-.lib-head h2 { font-family: var(--font-serif); font-weight: 900; font-size: 1.5rem; letter-spacing: 0.3em; color: var(--gold-2); }
+.lib-head h2 { font-family: var(--font-serif); font-weight: 900; font-size: 1.5rem; letter-spacing: 0.3em; color: var(--brass); }
 .lib-count { color: var(--muted); font-size: 0.82rem; letter-spacing: 0.1em; font-variant-numeric: tabular-nums; }
 .lib-tools { display: flex; gap: 0.5rem; }
 .lib-tools input {
@@ -475,7 +536,7 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
   transition: border-color 0.15s, color 0.15s, background-color 0.15s;
 }
 .tab:hover { border-color: #8a6430; color: var(--text); }
-.tab[aria-pressed='true'] { background: linear-gradient(180deg, #c79a55, #8a6430); border-color: var(--gold); color: #1a1007; font-weight: 700; }
+.tab[aria-pressed='true'] { background: #3a2b1b; border-color: var(--brass-dim); color: #f0d9a8; font-weight: 700; }
 
 /* 每一列元素坐在一塊木層板上；層板畫在捲動內容的背景裡，跟著一起捲 */
 .grid {
@@ -511,9 +572,12 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
   touch-action: manipulation;
   -webkit-user-select: none;
   user-select: none;
-  transition: border-color 0.12s, box-shadow 0.2s, transform 0.15s var(--ease-out);
+  -webkit-touch-callout: none;
+  transition: border-color 0.2s, box-shadow 0.3s, transform 0.25s var(--ease-out);
 }
-.el:hover { border-color: var(--gold); box-shadow: 0 0 16px -6px #e0ad4f99, inset 0 1px 0 #f6cf7a22; transform: translateY(-2px); }
+.el:hover { border-color: var(--brass-dim); box-shadow: 0 0 14px -8px #e0ad4f88, inset 0 1px 0 #f6cf7a1a; transform: translateY(-1px); }
+/* 長按快翻開典籍時，元素慢慢浮起來 */
+.el.pressing { border-color: var(--brass); transform: scale(1.05); box-shadow: 0 0 18px -6px #e0ad4f88; }
 .el:active { transform: scale(0.96); }
 .el .emoji { font-size: 1.65rem; line-height: 1.1; filter: drop-shadow(0 3px 3px #000); }
 .el .name {
@@ -593,7 +657,6 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; }
 }
 .toggle-chip:hover { border-color: #8a6430; color: var(--text); }
 .toggle-chip[aria-pressed='true'] { border-color: var(--gold); color: var(--gold-2); background: #e0ad4f1f; }
-.slots.shake { animation: shake 0.35s; }
 
 /* ───────── 對話框 ───────── */
 .dlg {
@@ -738,9 +801,42 @@ dialog::backdrop {
   inset: -40%;
   background: repeating-conic-gradient(from 0deg, #f6cf7a14 0deg 8deg, transparent 8deg 20deg);
   mask-image: radial-gradient(circle, #000 0%, transparent 55%);
-  animation: spin 12s linear infinite, fade-in 1s;
+  animation: spin 40s linear infinite, fade-in 1.4s;
   pointer-events: none;
 }
+
+/* 典籍頁 */
+.codex[open] { display: grid; gap: 0.9rem; }
+.codex-head {
+  display: flex;
+  justify-content: space-between;
+  margin: -0.3rem 0 0;
+  padding-block-end: 0.6rem;
+  border-block-end: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.82rem;
+  letter-spacing: 0.15em;
+}
+.codex-title { display: flex; align-items: center; gap: 0.9rem; }
+.codex-emoji { font-size: 2.8rem; line-height: 1; filter: drop-shadow(0 4px 8px #000a); }
+.dlg .codex-title h2 { margin: 0; font-weight: 900; font-size: 1.7rem; letter-spacing: 0.15em; color: #f0dcae; }
+.codex-title p { margin: 0.1rem 0 0; }
+.dlg .codex-desc {
+  margin: 0;
+  padding: 0.5rem 0 0.5rem 1rem;
+  border-inline-start: 2px solid #6b5132;
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #e6d9bf;
+}
+.codex-facts { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem; font-size: 0.92rem; }
+.codex-facts dt { color: var(--muted); }
+.codex-facts dd { margin: 0; display: grid; gap: 0.25rem; font-family: var(--font-serif); }
+.codex-el { display: inline-flex; align-items: center; gap: 0.2rem; }
+.codex-unknown { color: var(--brass); }
+.codex-foot { display: flex; justify-content: flex-end; gap: 0.6rem; margin-block-start: 0.3rem; }
+.codex-foot .primary-btn { min-inline-size: 8rem; }
 
 /* ───────── 手機版面 ───────── */
 @media (max-width: 760px) {
@@ -755,10 +851,8 @@ dialog::backdrop {
   .brand h1 { font-size: 1.35rem; letter-spacing: 0.1em; white-space: nowrap; }
   .subtitle { font-size: 0.9rem; }
   .tally { grid-template-columns: auto auto; align-items: center; column-gap: 0.7rem; }
-  .count-vis b { font-size: 1.9rem; }
-  .count-vis b { font-size: 1.7rem; }
-  .count-vis span { font-size: 0.68rem; letter-spacing: 0.05em; white-space: nowrap; }
-  .bar { display: none; }
+  .count { font-size: 0.75rem; letter-spacing: 0.03em; }
+  .count b { font-size: 0.95rem; }
   .actions { margin: 0; gap: 0.35rem; }
   .bench {
     container-type: normal;
@@ -778,7 +872,8 @@ dialog::backdrop {
   .slots { gap: 0.5rem; }
   .result { min-block-size: 2rem; font-size: 1rem; margin: 0; }
   .result .name { font-size: 1.15rem; }
-  .bench-actions .primary-btn { font-size: 1.3rem; padding-block: 0.45rem; min-inline-size: 11rem; }
+  .bench-actions .primary-btn { font-size: 1.15rem; padding-block: 0.4rem; min-inline-size: 10rem; }
+  .reveal-desc { font-size: 0.85rem; }
   .hint-banner { font-size: 0.85rem; padding: 0.35rem 0.7rem; }
   .help { font-size: 0.8rem; }
   .library {
@@ -806,23 +901,26 @@ dialog::backdrop {
 
 /* ───────── 動畫 ───────── */
 @keyframes drop-in { from { transform: scale(0.6); opacity: 0; } }
-@keyframes pull-in { to { transform: translateY(18px) scale(0.7); opacity: 0.2; } }
-@keyframes glow-pulse { to { opacity: 0.6; transform: scale(1.1); } }
+@keyframes sink { to { transform: translateY(22px) scale(0.82); opacity: 0.1; } }
 @keyframes bubble {
-  0% { transform: translateY(0); opacity: 0; }
-  30% { opacity: 1; }
-  100% { transform: translateY(-60px); opacity: 0; }
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  40% { opacity: 0.7; }
+  100% { transform: translateY(-34px) scale(1); opacity: 0; }
 }
-@keyframes shake {
-  20%, 60% { transform: translateX(-6px); }
-  40%, 80% { transform: translateX(6px); }
+@keyframes dim { 40% { opacity: 0.25; } }
+@keyframes smoke {
+  0% { opacity: 0; transform: translateY(10px) scale(0.8); }
+  35% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-40px) scale(1.4); }
 }
-@keyframes rise { from { transform: translateY(14px) scale(0.85); opacity: 0; } }
+@keyframes ripple { 0% { opacity: 0.55; transform: scale(0.6); } 100% { opacity: 0; transform: scale(1.35); } }
+@keyframes float-up { from { opacity: 0; transform: translateY(26px) scale(0.8); } }
+@keyframes soft-in { from { opacity: 0; transform: translateY(4px); } }
 @keyframes fade-in { from { opacity: 0; } }
-@keyframes pop { from { transform: translateY(8px) scale(0.92); opacity: 0; } }
+@keyframes pop { from { transform: translateY(8px) scale(0.96); opacity: 0; } }
 @keyframes emerge {
-  0% { transform: scale(0.2) rotate(-20deg); opacity: 0; filter: blur(6px) drop-shadow(0 0 24px #f6cf7a88); }
-  60% { transform: scale(1.12) rotate(4deg); opacity: 1; filter: blur(0) drop-shadow(0 0 32px #f6cf7aaa); }
+  0% { transform: translateY(24px) scale(0.7); opacity: 0; filter: drop-shadow(0 0 24px #f6cf7a88); }
+  100% { transform: none; opacity: 1; filter: drop-shadow(0 0 24px #f6cf7a88); }
 }
 @keyframes picked {
   35% { box-shadow: 0 0 22px 2px #f6cf7aaa; border-color: var(--gold-2); }

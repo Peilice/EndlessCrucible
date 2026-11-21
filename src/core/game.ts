@@ -90,6 +90,25 @@ export class Game {
     return uses.every((r) => this.discoveredSet.has(r.output));
   }
 
+  // ---- 典籍 ----
+
+  /** 能做出此元素、而且材料都已擁有的配方；只列玩家看得懂的路徑，不洩漏未發現的元素。 */
+  knownRecipesFor(id: ElementId): Recipe[] {
+    return (this.content.recipesByOutput.get(id) ?? []).filter((r) => r.inputs.every((i) => this.discoveredSet.has(i)));
+  }
+
+  /** 用到此元素、產物還沒發現的配方數。 */
+  unknownUseCount(id: ElementId): number {
+    return (this.content.recipesByInput.get(id) ?? []).filter((r) => !this.discoveredSet.has(r.output)).length;
+  }
+
+  /** 第幾個鍊成出來的元素（從 1 起算）；起始元素與未發現的元素回傳 0。 */
+  discoveryIndex(id: ElementId): number {
+    if (this.content.bases.includes(id)) return 0;
+    const i = this.save.discovered.filter((d) => !this.content.bases.includes(d)).indexOf(id);
+    return i + 1;
+  }
+
   // ---- 鍊成 ----
 
   async craft(inputs: readonly ElementId[]): Promise<CraftResult> {

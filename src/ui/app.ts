@@ -14,6 +14,7 @@ const buzz = (pattern: number | number[]) => navigator.vibrate?.(pattern);
 
 /** 介面偏好（不屬於遊戲進度，不放進存檔碼）。 */
 const HIDE_EXHAUSTED_KEY = 'endless-crucible:hide-exhausted';
+const AMBIENT_KEY = 'endless-crucible:ambient';
 function loadFlag(key: string): boolean {
   try {
     return localStorage.getItem(key) === '1';
@@ -214,6 +215,7 @@ export class App {
   private query = '';
   private sort: SortMode = 'order';
   private hideExhausted = loadFlag(HIDE_EXHAUSTED_KEY);
+  private ambient = loadFlag(AMBIENT_KEY);
   /** 還在飛往元素框途中的格子；重繪時先把內容藏起來，等元素落下才顯示。 */
   private incoming = new Set<number>();
   private lastPointer = '';
@@ -223,11 +225,8 @@ export class App {
 
   private el!: {
     progressText: HTMLElement;
-    progressN: HTMLElement;
-    progressTotal: HTMLElement;
     libCount: HTMLElement;
     hideEx: HTMLButtonElement;
-    progressFill: HTMLElement;
     hintCount: HTMLElement;
     crucible: HTMLElement;
     slots: HTMLElement;
@@ -246,6 +245,7 @@ export class App {
     dlgHint: HTMLDialogElement;
     dlgAch: HTMLDialogElement;
     dlgSettings: HTMLDialogElement;
+    dlgCodex: HTMLDialogElement;
   };
 
   constructor(
@@ -261,11 +261,8 @@ export class App {
     const r = this.root;
     this.el = {
       progressText: $(r, '#progress-text'),
-      progressN: $(r, '#progress-n'),
-      progressTotal: $(r, '#progress-total'),
       libCount: $(r, '#lib-count'),
       hideEx: $(r, '#btn-hide-ex') as HTMLButtonElement,
-      progressFill: $(r, '#progress-fill'),
       hintCount: $(r, '#hint-count'),
       crucible: $(r, '#crucible'),
       slots: $(r, '#slots'),
@@ -284,8 +281,16 @@ export class App {
       dlgHint: $(r, '#dlg-hint') as HTMLDialogElement,
       dlgAch: $(r, '#dlg-ach') as HTMLDialogElement,
       dlgSettings: $(r, '#dlg-settings') as HTMLDialogElement,
+      dlgCodex: $(r, '#dlg-codex') as HTMLDialogElement,
     };
-    for (const d of [this.el.dlgDiscover, this.el.dlgHint, this.el.dlgAch, this.el.dlgSettings]) setupDialog(d);
+    for (const d of [this.el.dlgDiscover, this.el.dlgHint, this.el.dlgAch, this.el.dlgSettings, this.el.dlgCodex]) setupDialog(d);
+
+    // 工房環境聲：瀏覽器要等第一次互動才肯發聲；切到背景時暫停
+    this.sfx.setAmbient(this.ambient);
+    window.addEventListener('pointerdown', () => this.sfx.resume(), { once: true });
+    document.addEventListener('visibilitychange', () =>
+      document.visibilityState === 'hidden' ? this.sfx.suspend() : this.sfx.resume(),
+    );
 
     this.bind();
     this.renderTabs();
@@ -304,11 +309,7 @@ export class App {
       <span class="subtitle" lang="en">${t('app.subtitle')}</span>
     </div>
     <div class="tally">
-      <p class="count">
-        <span class="visually-hidden" id="progress-text"></span>
-        <span class="count-vis" aria-hidden="true"><b id="progress-n"></b><span id="progress-total"></span></span>
-      </p>
-      <div class="bar" aria-hidden="true"><div id="progress-fill"></div></div>
+      <p class="count" id="progress-text"></p>
       <nav class="actions" aria-label="${t('header.settings')}">
         <button type="button" id="btn-hint" class="icon-btn">
           ${icon('hint')}<span class="visually-hidden">${t('header.hint')}</span>
@@ -333,6 +334,8 @@ export class App {
         <div class="pot-wrap" aria-hidden="true">
           ${CRUCIBLE}
           <div class="bubbles"><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="smoke"></div>
+          <div class="ripple"></div>
         </div>
         <div class="result" id="result"></div>
       </div>
@@ -364,6 +367,7 @@ export class App {
   <dialog id="dlg-hint" class="dlg" aria-labelledby="hint-title"></dialog>
   <dialog id="dlg-ach" class="dlg" aria-labelledby="ach-title"></dialog>
   <dialog id="dlg-settings" class="dlg" aria-labelledby="settings-title"></dialog>
+  <dialog id="dlg-codex" class="dlg codex" aria-labelledby="codex-title"></dialog>
 </div>`;
   }
 
@@ -395,12 +399,24 @@ export class App {
       const btn = (e.target as Element).closest<HTMLElement>('.el');
       if (btn?.dataset.id) this.addToSlot(btn.dataset.id, undefined, btn);
     });
+    el.grid.addEventListener('contextmenu', (e) => {
+      const btn = (e.target as Element).closest<HTMLElement>('.el');
+      if (!btn?.dataset.id) return;
+      e.preventDefault();
+      // 觸控的長按由 bindLongPress 處理；這裡負責滑鼠右鍵與鍵盤的選單鍵
+      if (this.lastPointer !== 'touch') this.openCodex(btn.dataset.id);
+    });
+    el.result.addEventListener('click', (e) => {
+      const btn = (e.target as Element).closest<HTMLElement>('[data-codex]');
+      if (btn?.dataset.codex) this.openCodex(btn.dataset.codex);
+    });
     el.hideEx.addEventListener('click', () => {
       this.hideExhausted = !this.hideExhausted;
       saveFlag(HIDE_EXHAUSTED_KEY, this.hideExhausted);
       this.renderLibrary();
     });
     this.bindDrag();
+    this.bindLongPress();
 
     el.search.addEventListener('input', () => {
       this.query = el.search.value.trim();
@@ -422,6 +438,45 @@ export class App {
     el.hintBanner.addEventListener('click', () => this.openHint());
     $(this.root, '#btn-ach').addEventListener('click', () => this.openAchievements());
     $(this.root, '#btn-settings').addEventListener('click', () => this.openSettings());
+  }
+
+  /** 觸控長按藥櫃裡的元素，放開時翻開典籍；手指移動（捲動清單）就取消。 */
+  private bindLongPress() {
+    this.el.grid.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'touch') return;
+      const btn = (e.target as Element).closest<HTMLElement>('.el');
+      const id = btn?.dataset.id;
+      if (!btn || !id) return;
+      const sx = e.clientX;
+      const sy = e.clientY;
+      let armed = false;
+      const timer = setTimeout(() => {
+        armed = true;
+        btn.classList.add('pressing');
+        buzz(10);
+      }, 450);
+      const cleanup = () => {
+        clearTimeout(timer);
+        btn.classList.remove('pressing');
+        window.removeEventListener('pointermove', move);
+        window.removeEventListener('pointerup', up);
+        window.removeEventListener('pointercancel', cleanup);
+      };
+      const move = (ev: PointerEvent) => {
+        if (Math.hypot(ev.clientX - sx, ev.clientY - sy) > 10) cleanup();
+      };
+      const up = () => {
+        cleanup();
+        if (!armed) return;
+        // 放開後瀏覽器還會送出 click，擋掉以免同時放進元素框
+        this.suppressClick = true;
+        setTimeout(() => (this.suppressClick = false), 0);
+        this.openCodex(id);
+      };
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', up);
+      window.addEventListener('pointercancel', cleanup);
+    });
   }
 
   /** 桌機（滑鼠／觸控筆）可以把元素拖到指定框；觸控以點選為主，不干擾清單捲動。 */
@@ -488,11 +543,8 @@ export class App {
     const touch = !!from && this.lastPointer === 'touch';
     const i = index ?? this.slots.findIndex((s) => s === null);
     if (i < 0) {
-      if (touch) buzz([25, 50, 25]);
+      if (touch) buzz(15);
       this.showResult(`<span class="muted">${t('crucible.full')}</span>`, 'warn');
-      this.el.slots.classList.remove('shake');
-      void this.el.slots.offsetWidth;
-      this.el.slots.classList.add('shake');
       return;
     }
     this.slots[i] = id;
@@ -569,7 +621,7 @@ export class App {
     this.busy = true;
     this.el.crucible.classList.add('brewing');
     this.el.result.innerHTML = '';
-    if (!reducedMotion()) await sleep(420);
+    if (!reducedMotion()) await sleep(1100);
     let result: CraftResult;
     try {
       result = await this.game.craft(inputs);
@@ -601,27 +653,45 @@ export class App {
       case 'new':
         this.sfx.discover();
         this.slots.fill(null);
-        this.showResult(this.resultChip(r.output), 'new');
-        this.openDiscover(r);
+        // 一般的新發現直接在坩堝下方揭曉，不打斷手上的動作；達成成就（含關鍵元素、終局）才跳出卡片
+        if (r.achievements.length > 0) {
+          this.showResult(this.resultChip(r.output), 'new');
+          this.openDiscover(r);
+        } else {
+          this.showResult(this.revealCard(r), 'reveal');
+          this.announce(`${t('discover.new')}：${r.output.name}。${r.output.desc}`);
+        }
         break;
     }
     this.renderBench();
   }
 
   private resultChip(e: ElementDef): string {
-    return `<span class="emoji">${e.emoji}</span><span class="name">${esc(e.name)}</span>`;
+    return `<button type="button" class="result-btn" data-codex="${e.id}" aria-label="${esc(t('discover.open', { name: e.name }))}">
+      <span class="emoji" aria-hidden="true">${e.emoji}</span><span class="name">${esc(e.name)}</span></button>`;
   }
 
-  private showResult(html: string, kind: 'new' | 'known' | 'fail' | 'warn') {
+  /** 新發現：元素從熔液浮上來，描述直接寫在坩堝下方；點一下可翻開典籍。 */
+  private revealCard(r: Extract<CraftResult, { kind: 'new' }>): string {
+    const e = r.output;
+    const hints = r.hintsGained > 0 ? `<span class="reveal-gain">${icon('hint')}${t('discover.hints', { n: r.hintsGained })}</span>` : '';
+    return `<button type="button" class="result-btn reveal" data-codex="${e.id}" aria-label="${esc(t('discover.open', { name: e.name }))}">
+      <span class="reveal-top"><span class="emoji" aria-hidden="true">${e.emoji}</span><span class="name">${esc(e.name)}</span><span class="reveal-tag">${t('discover.new')}</span></span>
+      <span class="reveal-desc">${esc(e.desc)}</span>${hints}</button>`;
+  }
+
+  private showResult(html: string, kind: 'new' | 'known' | 'reveal' | 'fail' | 'warn') {
     const res = this.el.result;
     res.className = 'result';
     res.innerHTML = html;
     void res.offsetWidth; // 重新觸發動畫
     res.classList.add(`is-${kind}`);
-    if (kind === 'fail') {
-      this.el.crucible.classList.remove('shake');
+    // 失敗：熔液暗一下、冒一縷煙；新發現：鍋面泛起一圈漣漪
+    const effect = kind === 'fail' ? 'dim' : kind === 'reveal' || kind === 'new' ? 'bloom' : '';
+    if (effect) {
+      this.el.crucible.classList.remove('dim', 'bloom');
       void this.el.crucible.offsetWidth;
-      this.el.crucible.classList.add('shake');
+      this.el.crucible.classList.add(effect);
     }
   }
 
@@ -652,11 +722,10 @@ export class App {
   private renderHeader() {
     const n = this.game.discoveredCount;
     const total = this.game.totalCount;
-    this.el.progressText.textContent = t('header.progress', { n, total });
-    this.el.progressN.textContent = String(n);
-    this.el.progressTotal.textContent = t('header.progressTotal', { total });
+    // 標題列只說典籍記了幾頁，不一直提醒「還差多少」；總數放在成就頁
+    this.el.progressText.innerHTML = t('header.progress', { n: `<b>${n}</b>` });
+    this.el.progressText.title = t('achievements.discovered', { n, total });
     this.el.libCount.textContent = t('list.count', { n });
-    this.el.progressFill.style.inlineSize = `${(n / total) * 100}%`;
     this.el.hintCount.textContent = String(this.game.data.hints.available);
   }
 
@@ -819,6 +888,43 @@ export class App {
     d.showModal();
   }
 
+  /** 典籍頁：重讀元素描述，看它怎麼鍊成、還能參與幾種未知的反應。 */
+  private openCodex(id: ElementId) {
+    const g = this.game;
+    const e = g.content.elements.get(id);
+    if (!e || !g.isDiscovered(id)) return;
+    const cat = g.content.categories.find((c) => c.id === e.category);
+    const name = (eid: ElementId) => {
+      const x = g.content.elements.get(eid)!;
+      return `<span class="codex-el"><span aria-hidden="true">${x.emoji}</span>${esc(x.name)}</span>`;
+    };
+    const order = g.discoveryIndex(id);
+    const recipes = g.knownRecipesFor(id);
+    const unknown = g.unknownUseCount(id);
+    const d = this.el.dlgCodex;
+    d.innerHTML = `
+      <p class="codex-head"><span>${t('codex.title')}${cat ? ` · ${esc(cat.name)}` : ''}</span><span>${t('codex.page', { n: g.data.discovered.indexOf(id) + 1 })}</span></p>
+      <div class="codex-title">
+        <span class="codex-emoji" aria-hidden="true">${e.emoji}</span>
+        <div><h2 id="codex-title">${esc(e.name)}</h2><p class="muted small">${order ? t('codex.order', { n: order }) : t('codex.base')}</p></div>
+      </div>
+      <p class="codex-desc">${esc(e.desc)}</p>
+      <dl class="codex-facts">
+        ${recipes.length ? `<dt>${t('codex.recipes')}</dt><dd>${recipes.map((r) => `<span class="codex-recipe">${r.inputs.map(name).join(' ＋ ')}</span>`).join('')}</dd>` : ''}
+        <dt>${t('codex.uses')}</dt><dd class="${unknown ? 'codex-unknown' : 'muted'}">${unknown ? t('codex.unknown', { n: unknown }) : t('codex.none')}</dd>
+      </dl>
+      <div class="codex-foot">
+        <form method="dialog"><button class="ghost-btn">${t('codex.close')}</button></form>
+        <button type="button" class="primary-btn" data-act="add">${t('codex.add')}</button>
+      </div>`;
+    d.onclick = (ev) => {
+      if (!(ev.target as Element).closest('[data-act="add"]')) return;
+      d.close();
+      this.addToSlot(id);
+    };
+    d.showModal();
+  }
+
   private openAchievements() {
     const g = this.game;
     const list = g.content.achievements;
@@ -826,7 +932,7 @@ export class App {
     const d = this.el.dlgAch;
     d.innerHTML = `
       <h2 id="ach-title">${icon('trophy')}${t('achievements.title')}</h2>
-      <p class="muted">${t('achievements.count', { n: unlocked, total: list.length })}</p>
+      <p class="muted">${t('achievements.count', { n: unlocked, total: list.length })} · ${t('achievements.discovered', { n: g.discoveredCount, total: g.totalCount })}</p>
       <ul class="ach-list">${list
         .map((a) => {
           const on = g.isAchievementUnlocked(a.id);
@@ -857,6 +963,11 @@ export class App {
         <span>${t('settings.sound')}</span>
         <button type="button" class="ghost-btn small with-icon" data-act="sound" aria-pressed="${!g.data.settings.muted}">
           ${soundLabel()}</button>
+      </section>
+      <section class="set-row">
+        <span>${t('settings.ambient')}</span>
+        <button type="button" class="ghost-btn small" data-act="ambient" aria-pressed="${this.ambient}" ${g.data.settings.muted ? 'disabled' : ''}>
+          ${this.ambient ? t('settings.on') : t('settings.off')}</button>
       </section>
       <section>
         <h3>${t('settings.stats')}</h3>
@@ -894,6 +1005,14 @@ export class App {
           this.sfx.muted = g.data.settings.muted;
           btn.setAttribute('aria-pressed', String(!g.data.settings.muted));
           btn.innerHTML = soundLabel();
+          ($(d, '[data-act="ambient"]') as HTMLButtonElement).disabled = g.data.settings.muted;
+          break;
+        case 'ambient':
+          this.ambient = !this.ambient;
+          saveFlag(AMBIENT_KEY, this.ambient);
+          this.sfx.setAmbient(this.ambient);
+          btn.setAttribute('aria-pressed', String(this.ambient));
+          btn.textContent = this.ambient ? t('settings.on') : t('settings.off');
           break;
         case 'copy': {
           const ta = $(d, '#export-code') as HTMLTextAreaElement;

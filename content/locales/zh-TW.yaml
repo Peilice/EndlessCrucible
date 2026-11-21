@@ -3,8 +3,7 @@
 
 app.title: 無垠鍊成
 app.subtitle: Endless Crucible
-header.progress: 已發現 {n} / {total}
-header.progressTotal: 已發現 / {total}
+header.progress: 典籍已錄 {n} 頁
 header.hint: 提示
 header.achievements: 成就
 header.settings: 設定
@@ -15,10 +14,10 @@ crucible.slot.label: 第 {n} 格
 crucible.slot.filled: 第 {n} 格：{name}，點一下取出
 crucible.craft: 鍊成
 crucible.clear: 清空
-crucible.tried: 試過了，沒反應
-crucible.help: 從藥櫃點 2～3 樣放進坩堝，再按「鍊成」
-crucible.fail: 沒有反應
-crucible.failRepeat: 還是沒有反應
+crucible.tried: 試過了，沒有共鳴
+crucible.help: 從藥櫃點 2～3 樣放進坩堝，再按「鍊成」。長按元素（桌機按右鍵）可以翻開典籍。
+crucible.fail: 這幾樣之間沒有共鳴
+crucible.failRepeat: 這幾樣之間沒有共鳴，換一樣試試
 crucible.known: 鍊成了{name}
 crucible.full: 三格都滿了，先取出一樣
 
@@ -35,6 +34,8 @@ list.allExhausted: 這一類都用完了，關掉「隱藏已用完」就看得�
 list.add: 放入 {name}
 
 discover.title: 新元素
+discover.new: 新發現
+discover.open: 翻開{name}的典籍頁
 discover.ok: 繼續
 discover.achievement: 達成成就：{name}
 discover.hints: 提示 +{n}
@@ -54,12 +55,14 @@ hint.close: 關閉
 
 achievements.title: 成就
 achievements.count: 已達成 {n} / {total}
+achievements.discovered: 已發現 {n} / {total} 種元素
 achievements.locked: 還沒達成
 achievements.reward: 提示 +{n}
 achievements.close: 關閉
 
 settings.title: 設定
 settings.sound: 音效
+settings.ambient: 工房環境聲
 settings.on: 開
 settings.off: 關
 settings.stats: 統計
@@ -79,6 +82,17 @@ settings.resetYes: 清除進度
 settings.resetNo: 取消
 settings.close: 關閉
 settings.version: 版本 {v}
+
+codex.title: 典籍
+codex.page: 第 {n} 頁
+codex.base: 起始元素
+codex.order: 第 {n} 個鍊成的元素
+codex.recipes: 鍊成方式
+codex.uses: 還能參與
+codex.unknown: "{n} 種還沒發現的反應"
+codex.none: 已經沒有未知的反應了
+codex.add: 放進坩堝
+codex.close: 關閉
 
 time.hm: "{h} 小時 {m} 分"
 time.m: "{m} 分"
