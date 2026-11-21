@@ -102,6 +102,27 @@ export class Game {
     return (this.content.recipesByInput.get(id) ?? []).filter((r) => !this.discoveredSet.has(r.output)).length;
   }
 
+  /**
+   * 典籍的空白頁：材料都已擁有、但還沒發現的元素，依內容順序。
+   * inputs 是可用配方中最少的材料數；只給 UI 判斷分類、材料數與提示是否指向它，畫面上不可顯示名稱。
+   */
+  codexBlanks(): { id: ElementId; category: string; inputs: number }[] {
+    const best = new Map<ElementId, number>();
+    for (const r of this.content.recipes) {
+      if (this.discoveredSet.has(r.output) || !r.inputs.every((i) => this.discoveredSet.has(i))) continue;
+      best.set(r.output, Math.min(best.get(r.output) ?? Infinity, r.inputs.length));
+    }
+    return this.content.elementList
+      .filter((e) => best.has(e.id))
+      .map((e) => ({ id: e.id, category: e.category, inputs: best.get(e.id)! }));
+  }
+
+  /** 這個分類的元素是否已全部發現。 */
+  isCategoryComplete(category: string): boolean {
+    const list = this.content.elementList.filter((e) => e.category === category);
+    return list.length > 0 && list.every((e) => this.discoveredSet.has(e.id));
+  }
+
   /** 第幾個鍊成出來的元素（從 1 起算）；起始元素與未發現的元素回傳 0。 */
   discoveryIndex(id: ElementId): number {
     if (this.content.bases.includes(id)) return 0;
@@ -185,7 +206,7 @@ export class Game {
       case 'complete':
         return this.discoveredCount >= this.totalCount;
       case 'category':
-        return this.content.elementList.filter((e) => e.category === c.category).every((e) => this.discoveredSet.has(e.id));
+        return this.isCategoryComplete(c.category);
       case 'element':
         return this.discoveredSet.has(c.element);
     }

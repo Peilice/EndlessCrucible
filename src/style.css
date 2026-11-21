@@ -185,6 +185,21 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
 .tally { display: grid; justify-items: end; gap: 0.35rem; }
 .count { margin: 0; color: var(--muted); font-size: 0.85rem; letter-spacing: 0.08em; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .count b { font-family: var(--font-serif); font-weight: 700; font-size: 1.1rem; color: var(--text); margin-inline: 0.15em; }
+/* 標題列的頁數就是典籍入口 */
+.count-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-block-size: max(var(--target), 36px);
+  padding: 0.15rem 0.75rem;
+  border: 1px solid #4a3824;
+  border-radius: 10px;
+  background: #0007;
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+}
+.count-btn .icon { color: var(--brass); }
+.count-short { display: none; }
+.count-btn:hover { border-color: var(--brass-dim); color: var(--text); background: #e0ad4f10; }
 .actions { display: flex; gap: 0.45rem; margin-block-start: 0.35rem; }
 .icon-btn {
   position: relative;
@@ -482,7 +497,7 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
 .hint-banner:hover { border-color: var(--gold); }
 .hint-banner .icon { margin-block-start: 0.2em; color: var(--gold); }
 
-/* ───────── 藥櫃（元素清單） ───────── */
+/* ───────── 元素架（元素清單） ───────── */
 .library {
   grid-area: shelf;
   --row: 84px;
@@ -642,7 +657,7 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; }
 .slot.filled.incoming { animation: none; }
 .slot.filled.incoming > * { opacity: 0; }
 
-/* 藥櫃標題列的「隱藏已用盡」開關 */
+/* 元素架標題列的「隱藏已用盡」開關 */
 .toggle-chip {
   min-block-size: calc(var(--target) - 8px);
   padding: 0.1rem 0.75rem;
@@ -838,6 +853,164 @@ dialog::backdrop {
 .codex-foot { display: flex; justify-content: flex-end; gap: 0.6rem; margin-block-start: 0.3rem; }
 .codex-foot .primary-btn { min-inline-size: 8rem; }
 
+/* 整本典籍：一列一個元素、描述攤開；寬的時候章節目錄放左側，窄的時候放上方可橫滑 */
+.dlg.book {
+  container: book / inline-size;
+  inline-size: min(96vw, 880px);
+  block-size: min(88dvh, 780px);
+  max-block-size: none;
+  padding: 0;
+  overflow: hidden;
+}
+.book-inner { display: grid; grid-template-rows: auto auto minmax(0, 1fr); block-size: 100%; }
+.book-head { display: flex; align-items: baseline; gap: 0.8rem; padding: 1.1rem 1.2rem 0.7rem; }
+.dlg .book-head h2 { margin: 0; font-weight: 900; font-size: 1.4rem; letter-spacing: 0.3em; color: var(--brass); }
+.book-head form { margin-inline-start: auto; }
+.book-close {
+  inline-size: max(var(--target), 36px);
+  block-size: max(var(--target), 36px);
+  border-radius: 50%;
+  border: 1px solid #4a3824;
+  background: #0006;
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+.book-close:hover { border-color: var(--brass-dim); color: var(--text); }
+.book-nav {
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0 1.2rem 0.75rem;
+  border-block-end: 1px solid var(--line);
+  mask-image: linear-gradient(90deg, #000 calc(100% - 2rem), transparent);
+}
+.book-nav::-webkit-scrollbar { display: none; }
+.chap-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-block-size: calc(var(--target) + 2px);
+  padding: 0.15rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid #00000066;
+  background: #00000040;
+  color: var(--muted);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+}
+.chap-btn:not(:disabled):hover { border-color: var(--brass-dim); color: var(--text); }
+.chap-btn[aria-current='true'] { background: #3a2b1b; border-color: var(--brass-dim); color: #f0d9a8; }
+.chap-btn:disabled { opacity: 0.4; cursor: default; }
+.chap-n { font-size: 0.78rem; font-variant-numeric: tabular-nums; }
+.seal-dot { inline-size: 7px; block-size: 7px; border-radius: 50%; background: #c2654a; }
+.book-body { overflow-y: auto; overscroll-behavior: contain; padding: 0.3rem 1.2rem 1.6rem; }
+.chapter { padding-block: 1rem 0.3rem; }
+.chap-title { display: flex; align-items: center; gap: 0.6rem; padding-block-end: 0.35rem; }
+.dlg .chap-title h3 { margin: 0; font-size: 1.05rem; letter-spacing: 0.2em; color: #e8d3a6; }
+.chap-pages { color: var(--muted); font-size: 0.8rem; letter-spacing: 0.08em; }
+.chap-title::after { content: ''; flex: 1; block-size: 1px; background: linear-gradient(90deg, #6b513288, transparent); }
+/* 整章集齊時蓋上的朱色印記 */
+.seal {
+  padding: 0.05rem 0.45rem;
+  border: 1.5px solid #9a4a32;
+  border-radius: 4px;
+  color: #d98a6c;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-indent: 0.2em;
+  transform: rotate(-4deg);
+}
+.entry {
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.2rem 0.8rem;
+  inline-size: 100%;
+  padding: 0.6rem 0.5rem;
+  border: 0;
+  border-block-end: 1px dashed var(--line);
+  background: none;
+  text-align: start;
+  transition: background-color 0.2s;
+}
+.entry:hover { background: #ffffff08; }
+.entry-emoji { font-size: 1.6rem; line-height: 1; text-align: center; filter: drop-shadow(0 3px 4px #000a); }
+.entry-text { display: grid; }
+.entry-name { font-family: var(--font-serif); font-weight: 700; font-size: 1.02rem; color: #f0dcae; }
+.entry-desc { font-family: var(--font-serif); font-size: 0.92rem; color: #cdbf9f; }
+.entry-page { color: #7c6c56; font-size: 0.75rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.book-page { display: grid; gap: 0.9rem; padding-block: 0.6rem 0.4rem; animation: soft-in 0.5s var(--ease-calm); }
+.book-back {
+  justify-self: start;
+  min-block-size: var(--target);
+  padding: 0.1rem 0.7rem 0.1rem 0.4rem;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+.book-back:hover { color: var(--text); background: #ffffff08; }
+/* 空白頁：現在就能鍊出來、但還沒發現的元素；不用 emoji 輪廓，避免爆雷 */
+.blank-mark {
+  display: grid;
+  place-items: center;
+  inline-size: 2.1rem;
+  block-size: 2.1rem;
+  margin-inline: auto;
+  border-radius: 50%;
+  border: 1.5px dashed #6b5132;
+  background: radial-gradient(circle at 40% 35%, #3a2b1b, #160f09 75%);
+  color: #8a7356;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+.entry.blank .entry-emoji { filter: none; }
+.entry.blank .entry-name { color: #7c6c56; letter-spacing: 0.3em; }
+.entry.blank .entry-desc { display: inline-flex; align-items: center; gap: 0.5rem; }
+.entry.blank:hover .blank-mark { border-color: var(--brass-dim); color: var(--brass); }
+.entry.blank.hinted { background: #e0ad4f0d; }
+.entry.blank.hinted .blank-mark { border-style: solid; border-color: var(--brass); color: var(--brass); }
+/* 材料數量：一樣材料一個空圈；提示揭露過的材料直接畫出來 */
+.mat-slots { display: inline-flex; align-items: center; gap: 0.3rem; }
+.mat-o { inline-size: 0.8rem; block-size: 0.8rem; border-radius: 50%; border: 1.5px solid #6b5132; }
+.mat-plus { color: #5e5040; font-size: 0.8rem; }
+.mat-got { font-size: 1rem; line-height: 1; }
+.hint-tag { display: inline-flex; align-items: center; margin: 0; padding: 0 0.4rem; border: 1px solid #6b5132; border-radius: 4px; color: var(--brass); font-family: var(--font-sans); font-size: 0.72rem; letter-spacing: 0.12em; }
+.blank-page {
+  display: grid;
+  justify-items: center;
+  gap: 0.8rem;
+  padding: 1.6rem 1rem;
+  border: 1.5px dashed #4a3824;
+  border-radius: 12px;
+  background: #00000026;
+  text-align: center;
+}
+.blank-page .blank-mark { inline-size: 3.6rem; block-size: 3.6rem; font-size: 1.6rem; }
+.dlg .blank-page h2 { margin: 0; font-size: 1.15rem; letter-spacing: 0.2em; color: var(--muted); }
+.blank-page p { margin: 0; font-family: var(--font-serif); color: #cdbf9f; max-inline-size: 22em; }
+.blank-page .mat-slots { gap: 0.6rem; }
+.blank-page .mat-o { inline-size: 1.6rem; block-size: 1.6rem; }
+.blank-page .mat-got { font-size: 1.7rem; }
+.blank-page .mat-plus { font-size: 1.1rem; }
+@container book (min-width: 620px) {
+  .book-inner { grid-template-columns: 11rem minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .book-head { grid-column: 1 / -1; border-block-end: 1px solid var(--line); padding-block-end: 0.85rem; }
+  .book-nav { flex-direction: column; overflow-y: auto; padding: 0.8rem; border-block-end: 0; border-inline-end: 1px solid var(--line); mask-image: none; }
+  .book-body { padding-inline: 1.5rem; }
+  .entry-desc { font-size: 0.96rem; }
+}
+
 /* ───────── 手機版面 ───────── */
 @media (max-width: 760px) {
   .app {
@@ -853,6 +1026,21 @@ dialog::backdrop {
   .tally { grid-template-columns: auto auto; align-items: center; column-gap: 0.7rem; }
   .count { font-size: 0.75rem; letter-spacing: 0.03em; }
   .count b { font-size: 0.95rem; }
+  .count-btn { gap: 0.3rem; padding-inline: 0.6rem; }
+  .count-full { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .count-short { display: inline; }
+  .subtitle { white-space: nowrap; }
+  /* 手機上典籍鋪滿整個畫面 */
+  .dlg.book {
+    inline-size: 100vw;
+    max-inline-size: 100vw;
+    block-size: 100dvh;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
+  }
+  .book-head, .book-nav, .book-body { padding-inline: max(1rem, env(safe-area-inset-left, 0px)) max(1rem, env(safe-area-inset-right, 0px)); }
   .actions { margin: 0; gap: 0.35rem; }
   .bench {
     container-type: normal;

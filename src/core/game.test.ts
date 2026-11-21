@@ -75,6 +75,27 @@ describe('典籍', () => {
     expect(g.knownRecipesFor('d').map((r) => r.key)).toEqual(['c+c']);
   });
 
+  it('空白頁只列現在就能鍊出來的元素', async () => {
+    const g = setup();
+    expect(g.codexBlanks()).toEqual([{ id: 'c', category: 'c', inputs: 2 }]); // a+b+c=e 還缺 c
+    await g.craft(['a', 'b']);
+    expect(g.codexBlanks()).toEqual([
+      { id: 'd', category: 'x', inputs: 2 },
+      { id: 'e', category: 'x', inputs: 3 },
+    ]);
+  });
+
+  it('分類集齊判定', async () => {
+    const g = setup();
+    expect(g.isCategoryComplete('x')).toBe(false);
+    await g.craft(['a', 'b']);
+    await g.craft(['c', 'c']);
+    expect(g.isCategoryComplete('x')).toBe(false); // 還差 e
+    await g.craft(['a', 'b', 'c']);
+    expect(g.isCategoryComplete('x')).toBe(true);
+    expect(g.isCategoryComplete('nope')).toBe(false);
+  });
+
   it('發現順序不算起始元素', async () => {
     const g = setup();
     expect(g.discoveryIndex('a')).toBe(0);

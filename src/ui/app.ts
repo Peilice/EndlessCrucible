@@ -46,6 +46,7 @@ const ICONS = {
   lock: '<rect x="5.5" y="11" width="13" height="9.5" rx="2"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/>',
   retry: '<path d="M4 12a8 8 0 1 0 2.6-5.9L4 8.5"/><path d="M4 4v4.5h4.5"/>',
   check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  book: '<path d="M4 5.5C6.5 4 9.5 4 12 6c2.5-2 5.5-2 8-.5v13c-2.5-1.5-5.5-1.5-8 .5-2.5-2-5.5-2-8-.5z"/><path d="M12 6v13"/>',
 } as const;
 
 function icon(name: keyof typeof ICONS, cls = 'icon'): string {
@@ -224,7 +225,7 @@ export class App {
   private renderQueued = false;
 
   private el!: {
-    progressText: HTMLElement;
+    progressText: HTMLButtonElement;
     libCount: HTMLElement;
     hideEx: HTMLButtonElement;
     hintCount: HTMLElement;
@@ -246,6 +247,7 @@ export class App {
     dlgAch: HTMLDialogElement;
     dlgSettings: HTMLDialogElement;
     dlgCodex: HTMLDialogElement;
+    dlgBook: HTMLDialogElement;
   };
 
   constructor(
@@ -260,7 +262,7 @@ export class App {
     this.root.innerHTML = this.template();
     const r = this.root;
     this.el = {
-      progressText: $(r, '#progress-text'),
+      progressText: $(r, '#progress-text') as HTMLButtonElement,
       libCount: $(r, '#lib-count'),
       hideEx: $(r, '#btn-hide-ex') as HTMLButtonElement,
       hintCount: $(r, '#hint-count'),
@@ -282,8 +284,9 @@ export class App {
       dlgAch: $(r, '#dlg-ach') as HTMLDialogElement,
       dlgSettings: $(r, '#dlg-settings') as HTMLDialogElement,
       dlgCodex: $(r, '#dlg-codex') as HTMLDialogElement,
+      dlgBook: $(r, '#dlg-book') as HTMLDialogElement,
     };
-    for (const d of [this.el.dlgDiscover, this.el.dlgHint, this.el.dlgAch, this.el.dlgSettings, this.el.dlgCodex]) setupDialog(d);
+    for (const d of [this.el.dlgDiscover, this.el.dlgHint, this.el.dlgAch, this.el.dlgSettings, this.el.dlgCodex, this.el.dlgBook]) setupDialog(d);
 
     // 工房環境聲：瀏覽器要等第一次互動才肯發聲；切到背景時暫停
     this.sfx.setAmbient(this.ambient);
@@ -309,7 +312,7 @@ export class App {
       <span class="subtitle" lang="en">${t('app.subtitle')}</span>
     </div>
     <div class="tally">
-      <p class="count" id="progress-text"></p>
+      <button type="button" class="count count-btn" id="progress-text"></button>
       <nav class="actions" aria-label="${t('header.settings')}">
         <button type="button" id="btn-hint" class="icon-btn">
           ${icon('hint')}<span class="visually-hidden">${t('header.hint')}</span>
@@ -368,6 +371,7 @@ export class App {
   <dialog id="dlg-ach" class="dlg" aria-labelledby="ach-title"></dialog>
   <dialog id="dlg-settings" class="dlg" aria-labelledby="settings-title"></dialog>
   <dialog id="dlg-codex" class="dlg codex" aria-labelledby="codex-title"></dialog>
+  <dialog id="dlg-book" class="dlg book" aria-labelledby="book-title"></dialog>
 </div>`;
   }
 
@@ -437,10 +441,11 @@ export class App {
     $(this.root, '#btn-hint').addEventListener('click', () => this.openHint());
     el.hintBanner.addEventListener('click', () => this.openHint());
     $(this.root, '#btn-ach').addEventListener('click', () => this.openAchievements());
+    el.progressText.addEventListener('click', () => this.openBook());
     $(this.root, '#btn-settings').addEventListener('click', () => this.openSettings());
   }
 
-  /** 觸控長按藥櫃裡的元素，放開時翻開典籍；手指移動（捲動清單）就取消。 */
+  /** 觸控長按元素架裡的元素，放開時翻開典籍；手指移動（捲動清單）就取消。 */
   private bindLongPress() {
     this.el.grid.addEventListener('pointerdown', (e) => {
       if (e.pointerType !== 'touch') return;
@@ -537,7 +542,7 @@ export class App {
 
   // ───────────────────────── 動作 ─────────────────────────
 
-  /** from：從藥櫃點選時傳入被點的按鈕，用來播放飛入元素框的動畫。 */
+  /** from：從元素架點選時傳入被點的按鈕，用來播放飛入元素框的動畫。 */
   private addToSlot(id: ElementId, index?: number, from?: HTMLElement) {
     if (this.busy) return;
     const touch = !!from && this.lastPointer === 'touch';
@@ -723,7 +728,8 @@ export class App {
     const n = this.game.discoveredCount;
     const total = this.game.totalCount;
     // 標題列只說典籍記了幾頁，不一直提醒「還差多少」；總數放在成就頁
-    this.el.progressText.innerHTML = t('header.progress', { n: `<b>${n}</b>` });
+    // 手機寬度放不下完整文字，只顯示圖示與數字；完整文字留給讀屏軟體
+    this.el.progressText.innerHTML = `${icon('book')}<span class="count-full">${t('header.progress', { n: `<b>${n}</b>` })}</span><b class="count-short" aria-hidden="true">${n}</b>`;
     this.el.progressText.title = t('achievements.discovered', { n, total });
     this.el.libCount.textContent = t('list.count', { n });
     this.el.hintCount.textContent = String(this.game.data.hints.available);
@@ -888,11 +894,159 @@ export class App {
     d.showModal();
   }
 
-  /** 典籍頁：重讀元素描述，看它怎麼鍊成、還能參與幾種未知的反應。 */
-  private openCodex(id: ElementId) {
+  /**
+   * 整本典籍：依分類分章，已發現的元素描述直接攤開。
+   * 章節只寫頁數不寫總數；整章集齊才蓋「集齊」印記（低壓力原則，見 DESIGN.md §2.6）。
+   * 現在就能鍊出來的元素留一頁空白頁，只顯示材料數量；提示揭露過的材料會寫在對應的空白頁上。
+   */
+  private openBook() {
     const g = this.game;
-    const e = g.content.elements.get(id);
-    if (!e || !g.isDiscovered(id)) return;
+    const d = this.el.dlgBook;
+    const found = g.discoveredElements();
+    const chapters = g.content.categories.map((c) => ({
+      ...c,
+      items: found.filter((e) => e.category === c.id),
+      complete: g.isCategoryComplete(c.id),
+    }));
+    // 空白頁：不帶名稱，只記分類、材料數與提示揭露的材料；提示中的那一頁排在該章空白頁的最前面
+    const hint = g.currentHint();
+    const blanks = g.codexBlanks().map((b) => {
+      const hinted = hint?.recipe.output === b.id;
+      return { category: b.category, inputs: hinted ? hint!.recipe.inputs.length : b.inputs, revealed: hinted ? hint!.revealed : [] };
+    });
+    blanks.sort((a, b) => Number(b.revealed.length > 0) - Number(a.revealed.length > 0));
+    const blanksOf = (cat: string) => blanks.map((b, i) => ({ ...b, i })).filter((b) => b.category === cat);
+    const shown = (c: { id: string; items: unknown[] }) => c.items.length > 0 || blanksOf(c.id).length > 0;
+    const slots = (b: (typeof blanks)[number]) =>
+      `<span class="mat-slots" aria-hidden="true">${Array.from({ length: b.inputs }, (_, k) => {
+        const got = b.revealed[k];
+        return (k ? '<span class="mat-plus">＋</span>' : '') + (got ? `<span class="mat-got">${got.emoji}</span>` : '<span class="mat-o"></span>');
+      }).join('')}</span>`;
+    const page = (id: ElementId) => g.data.discovered.indexOf(id) + 1;
+    d.innerHTML = `<div class="book-inner">
+      <div class="book-head">
+        <h2 id="book-title">${t('book.title')}</h2>
+        <span class="muted small">${t('book.pages', { n: found.length })}</span>
+        <form method="dialog"><button class="book-close" aria-label="${t('book.close')}">×</button></form>
+      </div>
+      <nav class="book-nav" aria-label="${t('book.chapters')}">${chapters
+        .map(
+          (c) => `<button type="button" class="chap-btn" data-chap="${c.id}" ${shown(c) ? '' : 'disabled'}>
+            <span><span aria-hidden="true">${c.emoji}</span> ${esc(c.name)}</span>
+            ${c.complete ? `<span class="seal-dot" title="${t('book.complete')}"></span><span class="visually-hidden">${t('book.complete')}</span>` : `<span class="chap-n">${c.items.length || (shown(c) ? '' : t('book.empty'))}</span>`}
+          </button>`,
+        )
+        .join('')}</nav>
+      <div class="book-body" id="book-body"></div>
+    </div>`;
+    const body = $(d, '#book-body');
+    let tocScroll = 0;
+
+    const renderToc = () => {
+      body.innerHTML = chapters
+        .filter(shown)
+        .map(
+          (c) => `<section class="chapter" data-chap="${c.id}" aria-labelledby="chap-${c.id}">
+            <div class="chap-title"><h3 id="chap-${c.id}"><span aria-hidden="true">${c.emoji}</span> ${esc(c.name)}</h3>
+              <span class="chap-pages">${c.items.length ? t('book.chapterPages', { n: c.items.length }) : t('book.noRecord')}</span>
+              ${c.complete ? `<span class="seal">${t('book.complete')}</span>` : ''}</div>
+            ${c.items
+              .map(
+                (e) => `<button type="button" class="entry" data-id="${e.id}">
+                  <span class="entry-emoji" aria-hidden="true">${e.emoji}</span>
+                  <span class="entry-text"><span class="entry-name">${esc(e.name)}</span><span class="entry-desc">${esc(e.desc)}</span></span>
+                  <span class="entry-page">${t('codex.page', { n: page(e.id) })}</span>
+                </button>`,
+              )
+              .join('')}
+            ${blanksOf(c.id)
+              .map((b) => {
+                const label = t('book.blankLabel', { cat: c.name, n: b.inputs }) + (b.revealed.length ? t('book.blankHinted') : '');
+                return `<button type="button" class="entry blank${b.revealed.length ? ' hinted' : ''}" data-blank="${b.i}" aria-label="${esc(label)}">
+                  <span class="entry-emoji" aria-hidden="true"><span class="blank-mark">？</span></span>
+                  <span class="entry-text"><span class="entry-name">${t('book.blankName')}</span>
+                    <span class="entry-desc">${slots(b)}${b.revealed.length ? `<span class="hint-tag">${t('book.hintTag')}</span>` : ''}</span></span>
+                  <span class="entry-page"></span>
+                </button>`;
+              })
+              .join('')}
+          </section>`,
+        )
+        .join('');
+      body.scrollTop = tocScroll;
+      syncNav();
+    };
+    const renderPage = (id: ElementId) => {
+      tocScroll = body.scrollTop;
+      body.innerHTML = `<article class="book-page" aria-labelledby="book-page-title">
+          <button type="button" class="book-back" data-act="back">${t('book.back')}</button>
+          ${this.codexPage(id, 'book-page-title')}
+          <div class="codex-foot"><button type="button" class="primary-btn" data-act="add" data-id="${id}">${t('codex.add')}</button></div>
+        </article>`;
+      body.scrollTop = 0;
+      ($(body, '[data-act="back"]') as HTMLButtonElement).focus({ preventScroll: true });
+    };
+    // 空白頁不列材料（提示揭露過的除外），免得典籍變成免費、不限次數的提示
+    const renderBlank = (i: number) => {
+      const b = blanks[i]!;
+      const cat = g.content.categories.find((c) => c.id === b.category)!;
+      tocScroll = body.scrollTop;
+      body.innerHTML = `<article class="book-page" aria-labelledby="book-page-title">
+          <button type="button" class="book-back" data-act="back">${t('book.back')}</button>
+          <div class="blank-page">
+            <span class="blank-mark" aria-hidden="true">？</span>
+            <h2 id="book-page-title"><span aria-hidden="true">${cat.emoji}</span> ${t('book.blankTitle', { cat: esc(cat.name) })}</h2>
+            ${slots(b)}
+            <p>${t('book.blankBody', { n: b.inputs })}</p>
+            ${b.revealed.length ? `<p class="hint-tag">${t('book.blankHint', { list: b.revealed.map((e) => esc(e.name)).join('、') })}</p>` : ''}
+            <p class="muted small">${b.revealed.length && b.revealed.length < b.inputs ? t('book.blankHintMore') : t('book.blankNote')}</p>
+          </div>
+        </article>`;
+      body.scrollTop = 0;
+      ($(body, '[data-act="back"]') as HTMLButtonElement).focus({ preventScroll: true });
+    };
+    // 捲動時標出目前讀到哪一章
+    const syncNav = () => {
+      const secs = [...body.querySelectorAll<HTMLElement>('.chapter')];
+      if (!secs.length) return;
+      const top = body.scrollTop + 24;
+      let cur = secs[0]!;
+      for (const s of secs) if (s.offsetTop - body.offsetTop <= top) cur = s;
+      d.querySelectorAll('.chap-btn').forEach((b) => b.setAttribute('aria-current', String((b as HTMLElement).dataset.chap === cur.dataset.chap)));
+    };
+    body.addEventListener('scroll', syncNav, { passive: true });
+
+    d.onclick = (ev) => {
+      const target = ev.target as Element;
+      const chap = target.closest<HTMLButtonElement>('.chap-btn');
+      if (chap && !chap.disabled) {
+        if (!body.querySelector('.chapter')) renderToc();
+        const sec = body.querySelector<HTMLElement>(`.chapter[data-chap="${chap.dataset.chap}"]`);
+        if (sec) body.scrollTo({ top: sec.offsetTop - body.offsetTop - 4, behavior: reducedMotion() ? 'auto' : 'smooth' });
+        return;
+      }
+      const blank = target.closest<HTMLElement>('[data-blank]');
+      if (blank) return renderBlank(Number(blank.dataset.blank));
+      const entry = target.closest<HTMLElement>('.entry');
+      if (entry?.dataset.id) return renderPage(entry.dataset.id);
+      if (target.closest('[data-act="back"]')) {
+        renderToc();
+        return;
+      }
+      const add = target.closest<HTMLElement>('[data-act="add"]');
+      if (add?.dataset.id) {
+        d.close();
+        this.addToSlot(add.dataset.id);
+      }
+    };
+    d.showModal();
+    renderToc();
+  }
+
+  /** 單一元素的典籍頁內容；長按翻開的小視窗與整本典籍共用。 */
+  private codexPage(id: ElementId, headingId: string): string {
+    const g = this.game;
+    const e = g.content.elements.get(id)!;
     const cat = g.content.categories.find((c) => c.id === e.category);
     const name = (eid: ElementId) => {
       const x = g.content.elements.get(eid)!;
@@ -901,18 +1055,24 @@ export class App {
     const order = g.discoveryIndex(id);
     const recipes = g.knownRecipesFor(id);
     const unknown = g.unknownUseCount(id);
-    const d = this.el.dlgCodex;
-    d.innerHTML = `
+    return `
       <p class="codex-head"><span>${t('codex.title')}${cat ? ` · ${esc(cat.name)}` : ''}</span><span>${t('codex.page', { n: g.data.discovered.indexOf(id) + 1 })}</span></p>
       <div class="codex-title">
         <span class="codex-emoji" aria-hidden="true">${e.emoji}</span>
-        <div><h2 id="codex-title">${esc(e.name)}</h2><p class="muted small">${order ? t('codex.order', { n: order }) : t('codex.base')}</p></div>
+        <div><h2 id="${headingId}">${esc(e.name)}</h2><p class="muted small">${order ? t('codex.order', { n: order }) : t('codex.base')}</p></div>
       </div>
       <p class="codex-desc">${esc(e.desc)}</p>
       <dl class="codex-facts">
         ${recipes.length ? `<dt>${t('codex.recipes')}</dt><dd>${recipes.map((r) => `<span class="codex-recipe">${r.inputs.map(name).join(' ＋ ')}</span>`).join('')}</dd>` : ''}
         <dt>${t('codex.uses')}</dt><dd class="${unknown ? 'codex-unknown' : 'muted'}">${unknown ? t('codex.unknown', { n: unknown }) : t('codex.none')}</dd>
-      </dl>
+      </dl>`;
+  }
+
+  /** 典籍單頁（長按、右鍵或點鍊成結果翻開）。 */
+  private openCodex(id: ElementId) {
+    if (!this.game.isDiscovered(id)) return;
+    const d = this.el.dlgCodex;
+    d.innerHTML = `${this.codexPage(id, 'codex-title')}
       <div class="codex-foot">
         <form method="dialog"><button class="ghost-btn">${t('codex.close')}</button></form>
         <button type="button" class="primary-btn" data-act="add">${t('codex.add')}</button>
