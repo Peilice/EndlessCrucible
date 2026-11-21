@@ -96,10 +96,9 @@ book.blankName: ？？
 book.blankLabel: "{cat}的空白頁，需要 {n} 樣材料"
 book.blankHinted: ，提示進行中
 book.blankTitle: "{cat} · 空白頁"
-book.blankBody: 這一頁還空著。手邊的元素，已經足夠把它鍊出來，需要 {n} 樣材料。
+book.blankBody: 手邊的元素，已經足夠把它鍊出來。
 book.blankHint: 提示已揭露：{list}
 book.blankHintMore: 在提示裡再翻一層，這裡就會補上下一樣材料。
-book.blankNote: 鍊出來之後，這一頁就會寫上它的名字和描述。
 book.hintTag: 提示
 
 codex.title: 典籍

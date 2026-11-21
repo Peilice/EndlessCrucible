@@ -997,9 +997,9 @@ export class App {
             <span class="blank-mark" aria-hidden="true">？</span>
             <h2 id="book-page-title"><span aria-hidden="true">${cat.emoji}</span> ${t('book.blankTitle', { cat: esc(cat.name) })}</h2>
             ${slots(b)}
-            <p>${t('book.blankBody', { n: b.inputs })}</p>
+            <p>${t('book.blankBody')}</p>
             ${b.revealed.length ? `<p class="hint-tag">${t('book.blankHint', { list: b.revealed.map((e) => esc(e.name)).join('、') })}</p>` : ''}
-            <p class="muted small">${b.revealed.length && b.revealed.length < b.inputs ? t('book.blankHintMore') : t('book.blankNote')}</p>
+            ${b.revealed.length && b.revealed.length < b.inputs ? `<p class="muted small">${t('book.blankHintMore')}</p>` : ''}
           </div>
         </article>`;
       body.scrollTop = 0;
